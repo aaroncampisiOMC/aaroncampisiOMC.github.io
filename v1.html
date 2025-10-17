@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>IMA VAST Tester</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 40px 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    #player {
+      position: relative;
+      width: 720px;
+      height: 405px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      background: #000;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #ad-container {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    #controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      width: 720px;
+    }
+
+    #tag {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    #tag:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 3px rgba(74,144,226,0.2);
+    }
+
+    #request {
+      padding: 10px 20px;
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    #request:hover {
+      background: #357ABD;
+    }
+
+    #request:active {
+      transform: scale(0.97);
+    }
+
+    #logs {
+      white-space: pre-wrap;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      width: 720px;
+      height: 150px;
+      overflow: auto;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+  <div id="player">
+    <video id="content" playsinline preload="auto" controls>
+      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
+    </video>
+    <div id="ad-container"></div>
+  </div>
+
+  <div id="controls">
+    <input id="tag" placeholder="Paste VAST tag URL here" />
+    <button id="request">Test VAST</button>
+  </div>
+
+  <div id="logs"></div>
+
+  <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+  <script>
+    const content = document.getElementById('content');
+    const adContainer = document.getElementById('ad-container');
+    const logs = document.getElementById('logs');
+    const log = (...a)=>{logs.textContent += a.join(' ') + '\n'; logs.scrollTop=logs.scrollHeight;}
+
+    const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, content);
+    const adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+    let adsManager = null;
+
+    adsLoader.addEventListener(
+      google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+      (e) => {
+        log('ADS_MANAGER_LOADED');
+        adsManager = e.getAdsManager(content);
+
+        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => log('AD STARTED'));
+        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => log('AD COMPLETE'));
+        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (err)=>log('AD ERROR', err.getError?.toString()));
+
+        try {
+          adsManager.init(720, 405, google.ima.ViewMode.NORMAL);
+          adsManager.start();
+        } catch(err){ log('adsManager start error', err); }
+      }
+    );
+
+    adsLoader.addEventListener(
+      google.ima.AdErrorEvent.Type.AD_ERROR,
+      (e)=>{log('LOADER ERROR', e.getError?.toString());}
+    );
+
+    document.getElementById('request').onclick = () => {
+      const tagUrl = document.getElementById('tag').value.trim();
+      if (!tagUrl) return log('Enter a VAST tag URL');
+      log('Requesting:', tagUrl);
+
+      adDisplayContainer.initialize(); // user gesture unlock
+      content.pause();
+
+      const req = new google.ima.AdsRequest();
+      req.adTagUrl = tagUrl;
+      req.linearAdSlotWidth = 720;
+      req.linearAdSlotHeight = 405;
+      req.nonLinearAdSlotWidth = 720;
+      req.nonLinearAdSlotHeight = 150;
+
+      adsLoader.requestAds(req);
+    };
+  </script>
+</body>
+</html>
