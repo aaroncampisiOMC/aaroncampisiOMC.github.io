@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>VAST Check</title>
+  <title>Vastify</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -22,7 +22,7 @@
       display: flex;
       align-items: center; /* centers vertically */
       position: absolute;
-      top: 20px;
+      top: 40px;
       left: 40px;
       gap: 12px;
     }
@@ -30,7 +30,7 @@
     h1 {
       font-size: 3rem;
       font-weight: 600;
-      background: linear-gradient(90deg, #11998e, #38ef7d);
+      background: linear-gradient(90deg, #373B44, #4286f4);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin: 0;
@@ -93,7 +93,7 @@
 
     #request {
       padding: 12px 24px;
-      background: linear-gradient(90deg, #11998e, #38ef7d);
+      background: #4286f4;
       color: white;
       border: none;
       border-radius: 10px;
@@ -127,8 +127,8 @@
     #info h3 {
       margin: 0 0 8px;
       font-size: 16px;
-      font-weight: 600;
-      color: #11998e;
+      font-weight: 500;
+      color: #373B44;
     }
 
     #logs {
@@ -144,6 +144,27 @@
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     }
 
+    #clearLogs {
+  margin-top: 10px;
+  padding: 8px 18px;
+  background: transparent;
+  color: #44444477;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+}
+
+#clearLogs:hover {
+  background: #d9d9d9; /* light grey on hover */
+}
+
+#clearLogs:active {
+  transform: scale(0.97);
+}
+
     /* Right column */
     .right {
       flex: 1;
@@ -153,11 +174,11 @@
 
     #player {
       position: relative;
-      width: 720px;
-      height: 405px;
-      border-radius: 12px;
+      width: 768px;
+      height: 432px;
+      border-radius: 10px;
       overflow: hidden;
-      background: #000;
+      background: #fafafa;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
 
@@ -165,6 +186,7 @@
       width: 100%;
       height: 100%;
       display: block;
+      border-radius: inherit;
     }
 
     #ad-container {
@@ -177,7 +199,7 @@
 </head>
 <body>
 <header>
-  <h1>Vastly</h1>
+  <h1>Vastify</h1>
   <h2>VAST tag tester</h2>
 </header>
 
@@ -185,7 +207,7 @@
     <div class="left">
       <div id="controls">
         <input id="tag" placeholder="Paste VAST tag URL here" />
-        <button id="request">Test tag</button>
+        <button id="request">Load tag</button>
       </div>
 
       <div id="info">
@@ -194,15 +216,15 @@
       </div>
 
       <div id="logs"></div>
+      <button id="clearLogs">Clear log</button>
     </div>
 
     <div class="right">
       <div id="player">
         <video id="content"
-          playsinline
-          preload="auto"
-          controls
-          poster="https://www.aodomzale.si/wp-content/plugins/video-thumbnails/default.jpg">
+        playsinline
+        preload="auto"
+        poster="https://raw.githubusercontent.com/gist/pigeonflight/80cb4f51e9bd538b82b3895ad60a38d0/raw/7d4726abfcce7ad4d23763e6a8c942077d603789/video-placeholder.svg">
         </video>
         <div id="ad-container"></div>
       </div>
@@ -243,7 +265,7 @@
         adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (err)=>log('AD ERROR', err.getError?.toString()));
 
         try {
-          adsManager.init(720, 405, google.ima.ViewMode.NORMAL);
+          adsManager.init(768, 432, google.ima.ViewMode.NORMAL);
           adsManager.start();
         } catch(err){ log('adsManager start error', err); }
       }
@@ -272,7 +294,10 @@
 
       adsLoader.requestAds(req);
     };
+
+    document.getElementById('clearLogs').onclick = () => {
+      logs.textContent = '';
+    };
   </script>
 </body>
 </html>
-
