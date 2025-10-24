@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <title>Vastify</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Inter', Arial, sans-serif;
@@ -23,11 +25,22 @@
       align-items: center; /* centers vertically */
       position: absolute;
       top: 40px;
-      left: 40px;
+      width: 100%;
+      max-width: 1500px;
+      gap: 12px;
+    }
+
+    footer {
+      display: flex;
+      align-items: center; /* centers vertically */
+      position: absolute;
+      bottom: 40px;
+      max-width: 1500px;
       gap: 12px;
     }
 
     h1 {
+      font-family: 'DM Sans', Arial, sans-serif;
       font-size: 3rem;
       font-weight: 600;
       background: linear-gradient(90deg, #373B44, #4286f4);
@@ -38,6 +51,7 @@
     }
 
     h2 {
+      font-family: 'Inter', Arial, sans-serif;
       font-size: 1.2rem;
       font-weight: 400;
       background: linear-gradient(90deg, #444, #444);
@@ -77,6 +91,8 @@
 
     #tag {
       flex: 1;
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 300;
       padding: 12px 16px;
       border-radius: 10px;
       border: 1px solid #bbb;
@@ -87,18 +103,19 @@
     }
 
     #tag:focus {
-      border-color: #11998e;
-      box-shadow: 0 0 0 3px rgba(56,239,125,0.25);
+      border-color: #4286f4;
+      box-shadow: 0 0 0 2px #4286f433;
     }
 
     #request {
       padding: 12px 24px;
+      font-family: 'Inter', Arial, sans-serif;
       background: #4286f4;
       color: white;
       border: none;
       border-radius: 10px;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 300;
       cursor: pointer;
       transition: transform 0.1s, box-shadow 0.2s;
       box-shadow: 0 3px 6px rgba(0,0,0,0.15);
@@ -120,18 +137,23 @@
       border-radius: 10px;
       padding: 16px 20px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 300;
       font-size: 14px;
       line-height: 1.6;
     }
 
     #info h3 {
+      font-family: 'Inter', Arial, sans-serif;
       margin: 0 0 8px;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 400;
       color: #373B44;
     }
 
     #logs {
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 300;
       white-space: pre-wrap;
       font-size: 12px;
       border: 1px solid #ccc;
@@ -145,16 +167,17 @@
     }
 
     #clearLogs {
-  margin-top: 10px;
-  padding: 8px 18px;
-  background: transparent;
-  color: #44444477;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+      font-family: 'Inter', Arial, sans-serif;
+      margin-top: 10px;
+      padding: 8px 18px;
+      background: transparent;
+      color: #44444477;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
 }
 
 #clearLogs:hover {
@@ -230,6 +253,10 @@
       </div>
     </div>
   </div>
+
+  <footer>
+    <p style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #888;">OMG Facilitator Digital Operations</p>
+  </footer>
 
   <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
   <script>
