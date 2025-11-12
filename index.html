@@ -7,23 +7,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <style>
+    
+    .page {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh; /* maintains full-page feel */
+      box-sizing: border-box;
+      width: 100%;
+    }
+
     body {
       font-family: 'Inter', Arial, sans-serif;
       background-color: #fafafa;
       color: #444;
       margin: 0;
-      padding: 40px;
+      padding: 0px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
       box-sizing: border-box;
     }
 
     header {
       display: flex;
       align-items: center; /* centers vertically */
-      position: absolute;
       top: 40px;
       width: 100%;
       max-width: 1500px;
@@ -31,12 +40,7 @@
     }
 
     footer {
-      display: flex;
-      align-items: center; /* centers vertically */
-      position: absolute;
-      bottom: 40px;
-      max-width: 1500px;
-      gap: 12px;
+      margin-top: 100px;   /* small gap from content */
     }
 
     h1 {
@@ -65,13 +69,14 @@
 
 
     .container {
+      flex: 1;                /* take all available space */
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      justify-content: center; /* horizontal center */
+      align-items: center;     /* vertical center */
       gap: 40px;
       width: 100%;
       max-width: 1500px;
-      margin-top: 248px;
+      margin-top: 0;  
     }
 
     /* Left column */
@@ -81,6 +86,7 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      width: 100%;
     }
 
     #controls {
@@ -218,45 +224,128 @@
       width: 100%; height: 100%;
       cursor: pointer; z-index: 2;
     }
-  </style>
+
+    @media (max-width: 1100px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px; /* adjust if needed */
+    transition: all 0.4s ease;
+  }
+
+  .right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  #player {
+    width: 100%;
+    max-width: 768px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    transition: all 0.4s ease;
+  }
+}
+
+@media (max-width: 1100px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px;
+  }
+
+  .left, .right {
+    width: 100%;
+    max-width: 768px;
+  }
+
+  #controls,
+  #tag,
+  #request,
+  #info,
+  #logs,
+  #clearLogs {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  #controls {
+    flex-direction: column;
+  }
+
+  #request {
+    text-align: center;
+  }
+
+  #logs {
+    height: 160px;
+  }
+
+  #player {
+    width: 100%;
+    max-width: 768px;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (max-width: 1100px) {
+  header {
+    width: 100%;
+    max-width: 768px;
+    box-sizing: border-box;
+  }
+
+  h1, h2 {
+    margin-left: 0; /* ensure alignment with container edge */
+  }
+}
+
+</style>
 </head>
+
 <body>
-<header>
-  <h1>Vastify</h1>
-  <h2>VAST tag tester</h2>
-</header>
+  <div class="page">
+    
+    <header>
+      <h1>Vastify</h1>
+      <h2>VAST tag tester</h2>
+    </header>
 
-  <div class="container">
-    <div class="left">
-      <div id="controls">
-        <input id="tag" placeholder="Paste VAST tag URL here" />
-        <button id="request">Load tag</button>
+      <div class="container">
+        <div class="left">
+          <div id="controls">
+            <input id="tag" placeholder="Paste VAST tag URL here" />
+            <button id="request">Load tag</button>
+          </div>
+
+          <div id="info">
+            <h3>Ad Info</h3>
+            <div id="ad-details">No ad loaded yet.</div>
+          </div>
+
+          <div id="logs"></div>
+          <button id="clearLogs">Clear log</button>
+        </div>
+
+        <div class="right">
+          <div id="player">
+            <video id="content"
+            playsinline
+            preload="auto"
+            poster="https://raw.githubusercontent.com/gist/pigeonflight/80cb4f51e9bd538b82b3895ad60a38d0/raw/7d4726abfcce7ad4d23763e6a8c942077d603789/video-placeholder.svg">
+            </video>
+            <div id="ad-container"></div>
+          </div>
+        </div>
       </div>
 
-      <div id="info">
-        <h3>Ad Info</h3>
-        <div id="ad-details">No ad loaded yet.</div>
-      </div>
-
-      <div id="logs"></div>
-      <button id="clearLogs">Clear log</button>
-    </div>
-
-    <div class="right">
-      <div id="player">
-        <video id="content"
-        playsinline
-        preload="auto"
-        poster="https://raw.githubusercontent.com/gist/pigeonflight/80cb4f51e9bd538b82b3895ad60a38d0/raw/7d4726abfcce7ad4d23763e6a8c942077d603789/video-placeholder.svg">
-        </video>
-        <div id="ad-container"></div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
+      <footer>
     <p style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #888;">OMG Facilitator Digital Operations</p>
   </footer>
+  
+  </div>
+
+  
 
   <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
   <script>
