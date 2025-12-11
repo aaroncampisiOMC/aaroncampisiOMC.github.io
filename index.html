@@ -97,16 +97,27 @@
     }
 
     #tag {
-      flex: 1;
-      font-family: 'Inter', Arial, sans-serif;
-      font-weight: 300;
+      width: 100%;
+      display: block;       /* top-anchored */
+      resize: none;         /* prevent manual resizing */
+      overflow-y: scroll;   /* hide scrollbar */
+      height: auto;
       padding: 12px 16px;
       border-radius: 10px;
       border: 1px solid #bbb;
-      background-color: #FAFAFA;
+      font-family: 'Inter', Arial, sans-serif;
       font-size: 14px;
+      font-weight: 300;
       outline: none;
-      transition: border 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+      transition: height 0.2s ease, border 0.2s, box-shadow 0.2s;
+      max-height: 150px;
+      scrollbar-width: none;   /* Firefox */
+      -ms-overflow-style: none; /* IE 10+ */
+    }
+
+    #tag::-webkit-scrollbar {
+      display: none;
     }
 
     #tag:focus {
@@ -249,15 +260,10 @@
 }
 
 @media (max-width: 1100px) {
-  .container {
-    flex-direction: column;
-    align-items: center;
-    margin-top: 100px;
-  }
-
-  .left, .right {
+  .left {
     width: 100%;
     max-width: 768px;
+    transition: all 0.4s ease;
   }
 
   #controls,
@@ -267,7 +273,7 @@
   #logs,
   #clearLogs {
     width: 100%;
-    box-sizing: border-box;
+    max-width: 100%;
   }
 
   #controls {
@@ -281,27 +287,20 @@
   #logs {
     height: 160px;
   }
-
-  #player {
-    width: 100%;
-    max-width: 768px;
-    aspect-ratio: 16 / 9;
-  }
 }
 
-@media (max-width: 1100px) {
-  header {
-    width: 100%;
-    max-width: 768px;
-    box-sizing: border-box;
-  }
-
-  h1, h2 {
-    margin-left: 0; /* ensure alignment with container edge */
-  }
+/* --- Sticky columns --- */
+.left, .right {
+  position: sticky;
+  top: 250px; /* adjust to match header spacing */
+  align-self: flex-start; /* top-align in container */
 }
 
-</style>
+.container {
+  align-items: flex-start; /* ensures sticky works instead of vertical centering */
+}
+
+  </style>
 </head>
 
 <body>
@@ -315,9 +314,12 @@
       <div class="container">
         <div class="left">
           <div id="controls">
-            <input id="tag" placeholder="Paste VAST tag URL here" />
+            <div id="tag-wrapper" style="flex:1; display:block;">
+              <textarea id="tag" placeholder="Paste VAST tag URL here" rows="1"></textarea>
+            </div>
             <button id="request">Load tag</button>
           </div>
+
 
           <div id="info">
             <h3>Ad Info</h3>
@@ -415,7 +417,33 @@
     document.getElementById('clearLogs').onclick = () => {
       logs.textContent = '';
     };
+
+    const tagInput = document.getElementById('tag');
+
+    function resizeTextarea(el) {
+      const style = window.getComputedStyle(el);
+      const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+
+      // get current content height
+      const currentHeight = el.offsetHeight;
+
+      // temporarily set height to 'auto' so scrollHeight recalculates correctly
+      el.style.height = 'auto';
+      const newHeight = el.scrollHeight + border;
+
+      // set previous height back, then trigger transition to new height
+      el.style.height = currentHeight + 'px';
+      requestAnimationFrame(() => {
+        el.style.height = newHeight + 'px';
+      });
+    }
+
+    // initial resize
+    resizeTextarea(tagInput);
+
+    // listen for changes
+    tagInput.addEventListener('input', () => resizeTextarea(tagInput));
+
   </script>
 </body>
 </html>
-
