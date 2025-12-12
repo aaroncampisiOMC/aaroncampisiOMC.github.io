@@ -94,6 +94,8 @@
       display: flex;
       gap: 12px;
       width: 100%;
+      align-items: flex-start; /* ensures button stays top-aligned with textarea */
+
     }
 
     #tag {
@@ -139,6 +141,8 @@
             overflow: hidden;
             cursor: pointer;
             border: none;
+            flex-shrink: 0; /* prevents shrinking below content */
+
         }
 
         .gradient-btn::before {
@@ -147,11 +151,7 @@
             width: 300px;
             height: 300px; 
             background: conic-gradient(
-               /* transparent 70%, 
-                #ff0000,
-                #ffa500,
-                #ffff00,
-                #38ff49, */
+               /* transparent 70%, */
                 #29f8ff,
                 #277dff,
                 #a700ff,
@@ -197,10 +197,8 @@
     #info {
       margin-top: 20px;
       background: #eeeeee;
-      /* border: 1px solid #ccc; */
       border-radius: 20px;
       padding: 16px 20px;
-      /* box-shadow: 0 4px 8px rgba(0,0,0,0.05); */
       font-family: 'Inter', Arial, sans-serif;
       font-weight: 300;
       font-size: 14px;
@@ -262,8 +260,7 @@
       height: 432px;
       border-radius: 10px;
       overflow: hidden;
-      /* background: #fafafa;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2); */
+      transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
     }
 
     video {
@@ -303,11 +300,16 @@
 }
 
 @media (max-width: 1100px) {
-  .left {
+.left {
     width: 100%;
-    max-width: 768px;
+    max-width: 500px; /* or same as right column's max-width */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* center content horizontally */
     transition: all 0.4s ease;
-  }
+    position: static; /* remove sticky */
+}
+
 
   #controls,
   #tag,
@@ -316,7 +318,7 @@
   #logs,
   #clearLogs {
     width: 100%;
-    max-width: 100%;
+    max-width: 500px;
   }
 
   #controls {
@@ -332,16 +334,76 @@
   }
 }
 
-/* --- Sticky columns --- */
-  .left, .right {
-    position: sticky;
-    top: 250px; /* adjust to match header spacing */
-    align-self: flex-start; /* top-align in container */
+/* Desktop layout */
+.container {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start; /* top-align columns */
+  width: 100%;
+  max-width: 1500px;
+}
+
+/* Sticky columns on desktop */
+.left, .right {
+  position: sticky;
+  top: 250px;
+  align-self: flex-start;
+}
+
+/* Responsive layout for narrow screens */
+@media (max-width: 1100px) {
+  .container {
+    flex-direction: column; /* stack left & right vertically */
+    gap: 20px;
+    margin-top: 50px;
+    align-items: center; /* center columns */
   }
 
-  .container {
-    align-items: flex-start; /* ensures sticky works instead of vertical centering */
+  .left, .right {
+    position: static; /* remove sticky */
+    width: 100%;
   }
+
+  #player {
+    width: 100%;
+    max-width: 768px;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  /* optional adjustments for controls and textarea */
+  #controls {
+    flex-direction: column;
+  }
+
+@media (max-width: 1100px) {
+  #tag,
+  #request,
+  #info,
+  #logs,
+  #clearLogs {
+    width: 100%;
+    max-width: 500px;       /* match .left column width */
+    margin: 0 auto;         /* center them */
+    box-sizing: border-box; /* include padding in width calculation */
+  }
+}
+
+
+  #logs {
+    height: 160px;
+  }
+}
+
+@media (max-width: 1100px) {
+  #info {
+    margin-top: 20px;  /* keep existing gap */
+  }
+
+  #logs {
+    margin-top: 20px;  /* ensures gap below info */
+  }
+}
 
   .macro-action {
       font-family: 'Inter', Arial, sans-serif;
