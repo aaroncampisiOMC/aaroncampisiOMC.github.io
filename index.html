@@ -132,6 +132,7 @@
       transition: height 0.2s ease, border 0.2s, box-shadow 0.2s;
       scrollbar-width: none;
       -ms-overflow-style: none;
+      color: #444;
     }
 
     #tag::-webkit-scrollbar {
@@ -220,13 +221,15 @@
       font-family: 'Inter', Arial, sans-serif;
       font-weight: 400;
       white-space: pre-wrap;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       height: 200px;
       overflow: auto;
       margin-top: 20px;
-      padding: 10px;
+      padding: 16px 20px;
       border-radius: 20px;
       background: #eeeeee;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
     #clearLogs,
@@ -437,8 +440,8 @@
           const compatibility = ad.getTitle?.() || 'Unknown';
           const duration = ad.getDuration?.() || 'Unknown';
           adDetails.innerHTML = `
-            <strong>Compatibility:</strong> ${compatibility}<br>
-            <strong>Duration:</strong> ${duration} sec
+            Compatibility: ${compatibility}<br>
+            Duration: ${duration} seconds
           `;
           log('Ad loaded:', compatibility, duration + 's');
         });
