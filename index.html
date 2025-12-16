@@ -21,7 +21,7 @@
     }
 
     .page {
-      padding: 20px;
+      padding: 50px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -124,8 +124,8 @@
       border-radius: 20px;
       border: 0 solid #bbb;
       font-family: 'Inter', Arial, sans-serif;
-      font-size: 14px;
-      font-weight: 300;
+      font-size: 1rem;
+      font-weight: 400;
       outline: none;
       box-sizing: border-box;
       background: #eeeeee;
@@ -185,8 +185,8 @@
     .content {
       position: relative;
       z-index: 2;
-      color: #444;
-      font-size: 14px;
+      color: #777;
+      font-size: 1rem;
       font-weight: 400;
       display: flex;
       align-items: center;
@@ -203,24 +203,24 @@
       border-radius: 20px;
       padding: 16px 20px;
       font-family: 'Inter', Arial, sans-serif;
-      font-weight: 300;
-      font-size: 14px;
+      font-weight: 400;
+      font-size: 0.875rem;
       line-height: 1.6;
     }
 
     #info h3 {
       font-family: 'Inter', Arial, sans-serif;
       margin: 0 0 8px;
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: 400;
       color: #777;
     }
 
     #logs {
       font-family: 'Inter', Arial, sans-serif;
-      font-weight: 300;
+      font-weight: 400;
       white-space: pre-wrap;
-      font-size: 12px;
+      font-size: 0.875rem;
       height: 200px;
       overflow: auto;
       margin-top: 20px;
@@ -230,6 +230,7 @@
     }
 
     #clearLogs,
+    #refresh,
     .macro-action {
       font-family: 'Inter', Arial, sans-serif;
       padding: 8px 18px;
@@ -237,14 +238,15 @@
       color: #999;
       border: 0 solid #ccc;
       border-radius: 100px;
-      font-size: 13px;
+      font-size: 0.875rem;
       font-weight: 400;
       cursor: pointer;
       transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
     }
 
-    #clearLogs {
-      margin: 5px auto 0;
+    #clearLogs, 
+    #refresh {
+      margin: 5px 0 0;
       text-align: center;
     }
 
@@ -255,6 +257,7 @@
     }
 
     #clearLogs:hover,
+    #refresh:hover,
     .macro-action:hover {
       color: #4286f433;
     }
@@ -285,7 +288,7 @@
       z-index: 2;
     }
 
-    @media (max-width: 1448px) {
+    @media (max-width: 1600px) {
       .container {
         flex-direction: column;
         gap: 20px;
@@ -314,8 +317,7 @@
       #tag,
       #request,
       #info,
-      #logs,
-      #clearLogs {
+      #logs {
         width: 100%;
         max-width: 600px;
       }
@@ -348,6 +350,10 @@
       #logs {
         margin-top: 20px;
         box-sizing: border-box;
+      }
+
+      .left > div:last-child {
+        align-self: stretch;
       }
     }
   </style>
@@ -382,7 +388,10 @@
           </div>
 
           <div id="logs"></div>
-          <button id="clearLogs">Clear log</button>
+            <div style="display: flex; gap: 8px; justify-content: left;">
+              <button id="clearLogs">Clear log</button>
+              <button id="refresh">Refresh</button>
+            </div>
         </div>
 
         <div class="right">
@@ -398,7 +407,7 @@
       </div>
 
       <footer>
-    <p style="font-family: 'Inter', Arial, sans-serif; font-size: 12px; color: #888;">OMG Facilitator Digital Operations</p>
+    <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">OMG Facilitator Digital Operations</p>
   </footer>
   
   </div>
@@ -508,6 +517,29 @@
       tag.value = updated;
       resizeTextarea(tag);
       log('Replaced %%…%% macros with […]');
+    };
+
+    document.getElementById('refresh').onclick = () => {
+      // Clear logs
+      logs.textContent = '';
+      // Clear ad info
+      adDetails.textContent = 'No ad loaded yet.';
+      // Clear tag input
+      document.getElementById('tag').value = '';
+      resizeTextarea(tagInput);
+      // Reset video player
+      content.pause();
+      content.currentTime = 0;
+      content.load();
+      // Destroy ads manager if it exists
+      if (adsManager) {
+        try {
+          adsManager.destroy();
+          adsManager = null;
+        } catch(e) {
+          log('Error destroying ads manager:', e);
+        }
+      }
     };
   </script>
 </body>
