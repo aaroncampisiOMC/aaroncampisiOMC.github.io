@@ -223,7 +223,7 @@
       font-weight: 400;
       white-space: pre-wrap;
       font-size: 0.75rem;
-      height: 200px;
+      height: 120px;
       overflow: auto;
       margin-top: 20px;
       padding: 16px 20px;
@@ -288,6 +288,18 @@
 
     video.loaded {
       opacity: 1;
+    }
+
+    video::-webkit-media-controls {
+      display: none !important;
+    }
+
+    video::-webkit-media-controls-enclosure {
+      display: none !important;
+    }
+
+    video::-webkit-media-controls-panel {
+      display: none !important;
     }
 
     #ad-container {
@@ -410,8 +422,7 @@
           <div id="player">
             <video id="content"
             playsinline
-            preload="auto"
-            controls>
+            preload="auto">
             </video>
             <div id="ad-container"></div>
           </div>
@@ -573,16 +584,22 @@
         let finalUrl = 'None';
         if (adData.clickThrough) {
           try {
-            const url = new URL(adData.clickThrough);
-            // Look for common redirect parameters
-            const redirectParam = url.searchParams.get('url') || 
-                                  url.searchParams.get('redirect') || 
-                                  url.searchParams.get('dest') ||
-                                  url.searchParams.get('u');
-            if (redirectParam) {
-              finalUrl = decodeURIComponent(redirectParam);
+            // Look for adurl= parameter (common in DoubleClick/Google ads)
+            if (adData.clickThrough.includes('adurl=')) {
+              const adUrlPart = adData.clickThrough.split('adurl=')[1];
+              finalUrl = decodeURIComponent(adUrlPart);
             } else {
-              finalUrl = adData.clickThrough;
+              // Fall back to checking URL parameters
+              const url = new URL(adData.clickThrough);
+              const redirectParam = url.searchParams.get('url') || 
+                                    url.searchParams.get('redirect') || 
+                                    url.searchParams.get('dest') ||
+                                    url.searchParams.get('u');
+              if (redirectParam) {
+                finalUrl = decodeURIComponent(redirectParam);
+              } else {
+                finalUrl = adData.clickThrough;
+              }
             }
           } catch (e) {
             finalUrl = adData.clickThrough;
