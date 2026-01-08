@@ -609,7 +609,7 @@
         // Display ad info
         const duration = this.parseDuration(adData.duration);
         adDetails.innerHTML = `
-          Title: ${adData.title || 'Unknown'}<br>
+          Compatibility: ${adData.title || 'Unknown'}<br>
           Duration: ${duration > 0 ? duration.toFixed(1) + ' seconds' : 'Unknown'}<br>
           Click-through: ${finalUrl.length > 60 ? finalUrl.substring(0, 57) + '...' : finalUrl}
         `;
@@ -787,7 +787,7 @@
         return;
       }
 
-      log('=== Loading VAST Tag ===');
+      log('Loading VAST Tag...');
       adDetails.textContent = 'Loading ad info...';
 
       try {
@@ -822,10 +822,6 @@
       tag.value = updated;
       log('Replaced %%...%% macros with [...]');
     };
-
-    // Textarea auto-resize removed - users can now manually resize
-
-    log('VAST Tester ready');
   </script>
 </body>
 </html>
