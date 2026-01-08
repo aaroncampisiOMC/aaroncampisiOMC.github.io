@@ -7,6 +7,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" href="/check_circle_100dp_1F1F1F_FILL0_wght400_GRAD0_opsz48.png" type="image/png">
+
+  <!-- Video.js CSS -->
+  <link href="https://vjs.zencdn.net/8.14.1/video-js.css" rel="stylesheet" />
+
   <style>
     body {
       font-family: 'Inter', Arial, sans-serif;
@@ -274,21 +278,10 @@
       transition: all 0.4s ease;
     }
 
-    video {
+    .video-js {
       width: 100%;
       height: 100%;
-      display: block;
       border-radius: inherit;
-    }
-
-    #ad-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-      z-index: 2;
     }
 
     @media (max-width: 1600px) {
@@ -358,6 +351,30 @@
       .left > div:last-child {
         align-self: stretch;
       }
+
+      /* Make the Video.js player background transparent */
+        .video-js {
+        background-color: transparent !important;
+        }
+
+        /* Remove poster background */
+        .video-js .vjs-poster {
+        background-color: transparent !important;
+        }
+
+        /* Ensure the video element itself is transparent when no video */
+        .video-js .vjs-tech {
+        background-color: transparent !important;
+        }
+
+        .video-js .vjs-control-bar {
+        background: rgba(0,0,0,0.2); /* semi-transparent, or 0 for fully invisible */
+        }
+
+        /* Hide the default play button overlay */
+        .video-js .vjs-big-play-button {
+        display: none !important;
+        }
     }
   </style>
 </head>
@@ -370,180 +387,129 @@
       <h2>VAST tag tester</h2>
     </header>
 
-      <div class="container">
-        <div class="left">
-          <div id="controls">
-            <div id="tag-wrapper" style="flex:1; display:block;">
-              <textarea id="tag" placeholder="Paste VAST tag URL here" rows="1"></textarea>
-            </div>
-            <div button class="gradient-btn">
-              <div class="content">
+    <div class="container">
+      <div class="left">
+        <div id="controls">
+          <div id="tag-wrapper" style="flex:1; display:block;">
+            <textarea id="tag" placeholder="Paste VAST tag URL here" rows="1"></textarea>
+          </div>
+          <div button class="gradient-btn">
+            <div class="content">
               <span>Load tag</span>
-        </div>
-    </button>
             </div>
           </div>
-          <div id="macroReplace" class="macro-action">Fix third-party macros</div>
-
-          <div id="info">
-            <h3>Ad Info</h3>
-            <div id="ad-details">No ad loaded yet.</div>
-          </div>
-
-          <div id="logs"></div>
-            <div style="display: flex; gap: 8px; justify-content: left;">
-              <button id="clearLogs">Clear log</button>
-              <button id="refresh">Refresh</button>
-            </div>
         </div>
 
-        <div class="right">
-          <div id="player">
-            <video id="content"
-            playsinline
-            preload="auto"
-            poster="https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif">
-            </video>
-            <div id="ad-container"></div>
-          </div>
+        <div id="macroReplace" class="macro-action">Fix third-party macros</div>
+
+        <div id="info">
+          <h3>Ad Info</h3>
+          <div id="ad-details">No ad loaded yet.</div>
+        </div>
+
+        <div id="logs"></div>
+        <div style="display: flex; gap: 8px; justify-content: left;">
+          <button id="clearLogs">Clear log</button>
+          <button id="refresh">Refresh</button>
         </div>
       </div>
 
-      <footer>
-    <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">OMG Facilitator Digital Operations</p>
-  </footer>
-  
+      <div class="right">
+        <div id="player">
+          <video
+            id="content"
+            class="video-js vjs-default-skin"
+            controls
+            preload="auto"
+            poster="https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif">
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">OMG Facilitator Digital Operations</p>
+    </footer>
   </div>
 
-  
+  <!-- Video.js and VAST Plugin -->
+  <script src="https://vjs.zencdn.net/8.14.1/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@6.9.0/dist/videojs-contrib-ads.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-vast-plugin@2.0.2/dist/videojs-vast-plugin.min.js"></script>
 
-  <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
   <script>
-    const content = document.getElementById('content');
-    const adContainer = document.getElementById('ad-container');
     const logs = document.getElementById('logs');
     const adDetails = document.getElementById('ad-details');
-    const log = (...a)=>{logs.textContent += a.join(' ') + '\n'; logs.scrollTop=logs.scrollHeight;}
+    const tagInput = document.getElementById('tag');
 
-    const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, content);
-    const adsLoader = new google.ima.AdsLoader(adDisplayContainer);
-    let adsManager = null;
+    const log = (...a) => {
+      logs.textContent += a.join(' ') + '\n';
+      logs.scrollTop = logs.scrollHeight;
+    };
 
-    adsLoader.addEventListener(
-      google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-      (e) => {
-        log('ADS_MANAGER_LOADED');
-        adsManager = e.getAdsManager(content);
-
-        adsManager.addEventListener(google.ima.AdEvent.Type.LOADED, (ev) => {
-          const ad = ev.getAd();
-          const compatibility = ad.getTitle?.() || 'Unknown';
-          const duration = ad.getDuration?.() || 'Unknown';
-          adDetails.innerHTML = `
-            Compatibility: ${compatibility}<br>
-            Duration: ${duration} seconds
-          `;
-          log('Ad loaded:', compatibility, duration + 's');
-        });
-
-        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => log('AD STARTED'));
-        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => log('AD COMPLETE'));
-        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (err)=>log('AD ERROR', err.getError?.toString()));
-
-        try {
-          adsManager.init(768, 432, google.ima.ViewMode.NORMAL);
-          adsManager.start();
-        } catch(err){ log('adsManager start error', err); }
-      }
-    );
-
-    adsLoader.addEventListener(
-      google.ima.AdErrorEvent.Type.AD_ERROR,
-      (e)=>{log('LOADER ERROR', e.getError?.toString());}
-    );
+    const player = videojs('content', {
+      autoplay: false,
+      controls: true,
+      preload: 'auto'
+    });
 
     document.getElementsByClassName('gradient-btn')[0].onclick = () => {
-      const tagUrl = document.getElementById('tag').value.trim();
+      const tagUrl = tagInput.value.trim();
       if (!tagUrl) return log('Enter a VAST tag URL');
       log('Requesting:', tagUrl);
       adDetails.textContent = 'Loading ad info...';
 
-      adDisplayContainer.initialize(); // user gesture unlock
-      content.pause();
-
-      const req = new google.ima.AdsRequest();
-      req.adTagUrl = tagUrl;
-      req.linearAdSlotWidth = 720;
-      req.linearAdSlotHeight = 405;
-      req.nonLinearAdSlotWidth = 720;
-      req.nonLinearAdSlotHeight = 150;
-
-      adsLoader.requestAds(req);
-    };
-
-    document.getElementById('clearLogs').onclick = () => {
-      logs.textContent = '';
-    };
-
-    const tagInput = document.getElementById('tag');
-
-    function resizeTextarea(el) {
-      const style = window.getComputedStyle(el);
-      const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
-
-      // get current content height
-      const currentHeight = el.offsetHeight;
-
-      // temporarily set height to 'auto' so scrollHeight recalculates correctly
-      el.style.height = 'auto';
-      const newHeight = el.scrollHeight + border;
-
-      // set previous height back, then trigger transition to new height
-      el.style.height = currentHeight + 'px';
-      requestAnimationFrame(() => {
-        el.style.height = newHeight + 'px';
+      player.vastClient({
+        adTagUrl: tagUrl,
+        playAdAlways: true,
+        verbosity: 3
       });
-    }
 
-    // initial resize
-    resizeTextarea(tagInput);
+      player.on('adstart', () => {
+        const ad = player.vastClient.getCurrentAd();
+        if (ad) {
+          adDetails.innerHTML = `
+            Title: ${ad.title || 'Unknown'}<br>
+            Duration: ${ad.duration || 'Unknown'} seconds
+          `;
+          log('Ad started:', ad.title || 'Unknown', ad.duration + 's');
+        }
+      });
 
-    // listen for changes
-    tagInput.addEventListener('input', () => resizeTextarea(tagInput));
+      player.on('adend', () => log('Ad complete'));
+      player.on('adskip', () => log('Ad skipped'));
+      player.on('aderror', (e) => log('Ad error', e));
+    };
+
+    document.getElementById('clearLogs').onclick = () => logs.textContent = '';
 
     document.getElementById('macroReplace').onclick = () => {
-      const tag = document.getElementById('tag');
-
-      // Match anything between %%…%%, lazily.
+      const tag = tagInput;
       const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
-
       tag.value = updated;
-      resizeTextarea(tag);
       log('Replaced %%…%% macros with […]');
     };
 
     document.getElementById('refresh').onclick = () => {
-      // Clear logs
       logs.textContent = '';
-      // Clear ad info
       adDetails.textContent = 'No ad loaded yet.';
-      // Clear tag input
-      document.getElementById('tag').value = '';
-      resizeTextarea(tagInput);
-      // Reset video player
-      content.pause();
-      content.currentTime = 0;
-      content.load();
-      // Destroy ads manager if it exists
-      if (adsManager) {
-        try {
-          adsManager.destroy();
-          adsManager = null;
-        } catch(e) {
-          log('Error destroying ads manager:', e);
-        }
-      }
+      tagInput.value = '';
+      player.reset();
     };
+
+    // Textarea auto-resize
+    function resizeTextarea(el) {
+      const style = window.getComputedStyle(el);
+      const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+      const currentHeight = el.offsetHeight;
+      el.style.height = 'auto';
+      const newHeight = el.scrollHeight + border;
+      el.style.height = currentHeight + 'px';
+      requestAnimationFrame(() => el.style.height = newHeight + 'px');
+    }
+
+    resizeTextarea(tagInput);
+    tagInput.addEventListener('input', () => resizeTextarea(tagInput));
   </script>
 </body>
 </html>
