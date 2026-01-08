@@ -116,10 +116,11 @@
     #tag {
       width: 100%;
       display: block;
-      resize: none;
-      overflow-y: scroll;
-      height: auto;
-      max-height: 80px;
+      resize: vertical;
+      overflow-y: auto;
+      height: 44px;
+      min-height: 44px;
+      max-height: 200px;
       padding: 12px 16px;
       border-radius: 20px;
       border: 0 solid #bbb;
@@ -129,7 +130,7 @@
       outline: none;
       box-sizing: border-box;
       background: #eeeeee;
-      transition: height 0.2s ease, border 0.2s, box-shadow 0.2s;
+      transition: border 0.2s, box-shadow 0.2s;
       scrollbar-width: none;
       -ms-overflow-style: none;
       color: #444;
@@ -383,7 +384,7 @@
         <div class="left">
           <div id="controls">
             <div id="tag-wrapper" style="flex:1; display:block;">
-              <textarea id="tag" placeholder="Paste VAST tag URL here" rows="1"></textarea>
+              <textarea id="tag" placeholder="Paste VAST tag URL here"></textarea>
             </div>
             <button class="gradient-btn">
               <div class="content">
@@ -568,15 +569,32 @@
         this.adData = adData;
         this.trackingFired = {};
 
+        // Extract final destination URL from click-through
+        let finalUrl = 'None';
+        if (adData.clickThrough) {
+          try {
+            const url = new URL(adData.clickThrough);
+            // Look for common redirect parameters
+            const redirectParam = url.searchParams.get('url') || 
+                                  url.searchParams.get('redirect') || 
+                                  url.searchParams.get('dest') ||
+                                  url.searchParams.get('u');
+            if (redirectParam) {
+              finalUrl = decodeURIComponent(redirectParam);
+            } else {
+              finalUrl = adData.clickThrough;
+            }
+          } catch (e) {
+            finalUrl = adData.clickThrough;
+          }
+        }
+
         // Display ad info
         const duration = this.parseDuration(adData.duration);
-        const clickThroughUrl = adData.clickThrough || 'None';
         adDetails.innerHTML = `
           Title: ${adData.title || 'Unknown'}<br>
           Duration: ${duration > 0 ? duration.toFixed(1) + ' seconds' : 'Unknown'}<br>
-          Media Files: ${adData.mediaFiles.length}<br>
-          Tracking Events: ${Object.keys(adData.trackingEvents).length}<br>
-          Click-through: ${clickThroughUrl.length > 50 ? clickThroughUrl.substring(0, 47) + '...' : clickThroughUrl}
+          Click-through: ${finalUrl.length > 60 ? finalUrl.substring(0, 57) + '...' : finalUrl}
         `;
 
         // Select best media file (prefer MP4)
@@ -696,8 +714,11 @@
 
         // Error event
         this.video.addEventListener('error', (e) => {
-          log(`Video error: ${this.video.error?.message || 'Unknown error'}`);
-          this.fireTracking('error');
+          // Only log error if video has a valid source
+          if (this.video.src && this.video.src !== window.location.href) {
+            log(`Video error: ${this.video.error?.message || 'Unknown error'}`);
+            this.fireTracking('error');
+          }
         });
 
         // Pause/Resume
@@ -771,9 +792,8 @@
       logs.textContent = '';
       adDetails.textContent = 'No ad loaded yet.';
       document.getElementById('tag').value = '';
-      resizeTextarea(tagInput);
       content.pause();
-      content.src = '';
+      content.removeAttribute('src');
       content.classList.remove('loaded');
       content.load();
     };
@@ -783,27 +803,10 @@
       const tag = document.getElementById('tag');
       const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
       tag.value = updated;
-      resizeTextarea(tag);
       log('Replaced %%...%% macros with [...]');
     };
 
-    // Textarea auto-resize
-    const tagInput = document.getElementById('tag');
-
-    function resizeTextarea(el) {
-      const style = window.getComputedStyle(el);
-      const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
-      const currentHeight = el.offsetHeight;
-      el.style.height = 'auto';
-      const newHeight = el.scrollHeight + border;
-      el.style.height = currentHeight + 'px';
-      requestAnimationFrame(() => {
-        el.style.height = newHeight + 'px';
-      });
-    }
-
-    resizeTextarea(tagInput);
-    tagInput.addEventListener('input', () => resizeTextarea(tagInput));
+    // Textarea auto-resize removed - users can now manually resize
 
     log('VAST Tester ready');
   </script>
