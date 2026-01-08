@@ -7,10 +7,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" href="/check_circle_100dp_1F1F1F_FILL0_wght400_GRAD0_opsz48.png" type="image/png">
-
-  <!-- Video.js CSS -->
-  <link href="https://vjs.zencdn.net/8.20.1/video-js.css" rel="stylesheet" />
-
   <style>
     body {
       font-family: 'Inter', Arial, sans-serif;
@@ -276,23 +272,31 @@
       border-radius: 10px;
       overflow: hidden;
       transition: all 0.4s ease;
+      background: url('https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif') center/contain no-repeat;
     }
 
-    .video-js {
+    video {
       width: 100%;
       height: 100%;
+      display: block;
       border-radius: inherit;
-      background-color: transparent !important;
+      background: transparent;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
-    .video-js .vjs-poster,
-    .video-js .vjs-tech {
-      background-color: transparent !important;
+    video.loaded {
+      opacity: 1;
     }
 
-    .video-js .vjs-control-bar,
-    .video-js .vjs-big-play-button {
-      display: none !important;
+    #ad-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
     }
 
     @media (max-width: 1600px) {
@@ -368,106 +372,395 @@
 
 <body>
   <div class="page">
+    
     <header>
       <h1>Vastify</h1>
       <h2>VAST tag tester</h2>
     </header>
 
-    <div class="container">
-      <div class="left">
-        <div id="controls">
-          <div id="tag-wrapper" style="flex:1; display:block;">
-            <textarea id="tag" placeholder="Paste VAST tag URL here" rows="1"></textarea>
-          </div>
-          <div button class="gradient-btn">
-            <div class="content">
-              <span>Load tag</span>
+      <div class="container">
+        <div class="left">
+          <div id="controls">
+            <div id="tag-wrapper" style="flex:1; display:block;">
+              <textarea id="tag" placeholder="Paste VAST tag URL here" rows="1"></textarea>
             </div>
+            <button class="gradient-btn">
+              <div class="content">
+                <span>Load tag</span>
+              </div>
+            </button>
           </div>
-        </div>
-        <div id="macroReplace" class="macro-action">Fix third-party macros</div>
+          <div id="macroReplace" class="macro-action">Fix third-party macros</div>
 
-        <div id="info">
-          <h3>Ad Info</h3>
-          <div id="ad-details">No ad loaded yet.</div>
+          <div id="info">
+            <h3>Ad Info</h3>
+            <div id="ad-details">No ad loaded yet.</div>
+          </div>
+
+          <div id="logs"></div>
+            <div style="display: flex; gap: 8px; justify-content: left;">
+              <button id="clearLogs">Clear log</button>
+              <button id="refresh">Refresh</button>
+            </div>
         </div>
 
-        <div id="logs"></div>
-        <div style="display: flex; gap: 8px; justify-content: left;">
-          <button id="clearLogs">Clear log</button>
-          <button id="refresh">Refresh</button>
-        </div>
-      </div>
-
-      <div class="right">
-        <div id="player">
-          <video
-            id="content"
-            class="video-js"
+        <div class="right">
+          <div id="player">
+            <video id="content"
             playsinline
             preload="auto"
-            poster="https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif">
-          </video>
+            controls>
+            </video>
+            <div id="ad-container"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <footer>
-      <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">OMG Facilitator Digital Operations</p>
-    </footer>
+      <footer>
+        <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">OMG Facilitator Digital Operations</p>
+      </footer>
+  
   </div>
 
-  <!-- Video.js & plugins -->
-  <script src="https://vjs.zencdn.net/8.20.1/video.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@6.10.0/dist/videojs.ads.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-ima@1.12.0/dist/videojs.ima.min.js"></script>
-
   <script>
+    const content = document.getElementById('content');
+    const adContainer = document.getElementById('ad-container');
     const logs = document.getElementById('logs');
     const adDetails = document.getElementById('ad-details');
-    const log = (...a)=>{logs.textContent += a.join(' ') + '\n'; logs.scrollTop=logs.scrollHeight;}
-
-    const player = videojs('content', {
-      controls: false,
-      autoplay: false,
-      muted: true,
-      preload: 'auto'
-    });
-
-    document.getElementsByClassName('gradient-btn')[0].onclick = () => {
-      const tagUrl = document.getElementById('tag').value.trim();
-      if (!tagUrl) return log('Enter a VAST tag URL');
-
-      log('Requesting VAST tag:', tagUrl);
-      adDetails.textContent = 'Loading ad info...';
-
-      player.ima({
-        adTagUrl: tagUrl,
-        debug: true
-      });
-
-      player.ima.requestAds();
-      player.play();
-
-      player.ima.on('adsready', () => log('Ad ready to play'));
-      player.ima.on('adstart', () => {
-        log('Ad started');
-        const ad = player.ima.getAdsManager().getCurrentAd();
-        if (ad) {
-          const title = ad.getTitle ? ad.getTitle() : 'Unknown';
-          const duration = ad.getDuration ? ad.getDuration() : 'Unknown';
-          adDetails.innerHTML = `Title: ${title}<br>Duration: ${duration} seconds`;
-        }
-      });
-      player.ima.on('adend', () => log('Ad ended'));
-      player.ima.on('aderror', (err) => log('Ad error', err));
+    const log = (...a) => {
+      logs.textContent += a.join(' ') + '\n';
+      logs.scrollTop = logs.scrollHeight;
     };
 
+    // Custom VAST Parser
+    class VASTParser {
+      constructor() {
+        this.maxRedirects = 5;
+      }
+
+      async parseVAST(url, redirectCount = 0) {
+        if (redirectCount >= this.maxRedirects) {
+          throw new Error('Max VAST redirects exceeded');
+        }
+
+        log(`Fetching VAST from: ${url}`);
+        
+        try {
+          const response = await fetch(url);
+          const text = await response.text();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, 'text/xml');
+
+          // Check for XML parsing errors
+          const parserError = xml.querySelector('parsererror');
+          if (parserError) {
+            throw new Error('XML parsing error');
+          }
+
+          const vast = xml.querySelector('VAST');
+          if (!vast) {
+            throw new Error('Invalid VAST response');
+          }
+
+          const version = vast.getAttribute('version');
+          log(`VAST version: ${version}`);
+
+          // Check for wrapper (redirect)
+          const wrapper = xml.querySelector('Wrapper');
+          if (wrapper) {
+            log('VAST Wrapper detected, following redirect...');
+            const vastAdTagURI = wrapper.querySelector('VASTAdTagURI');
+            if (vastAdTagURI) {
+              const redirectUrl = vastAdTagURI.textContent.trim();
+              return await this.parseVAST(redirectUrl, redirectCount + 1);
+            }
+          }
+
+          // Parse inline ad
+          const inline = xml.querySelector('InLine');
+          if (!inline) {
+            throw new Error('No InLine ad found');
+          }
+
+          const adData = {
+            title: this.getTextContent(inline, 'AdTitle'),
+            duration: this.getTextContent(inline, 'Duration'),
+            mediaFiles: [],
+            trackingEvents: {},
+            clickThrough: null,
+            clickTracking: []
+          };
+
+          // Parse media files
+          const mediaFiles = inline.querySelectorAll('MediaFile');
+          mediaFiles.forEach(mf => {
+            adData.mediaFiles.push({
+              url: mf.textContent.trim(),
+              type: mf.getAttribute('type'),
+              width: mf.getAttribute('width'),
+              height: mf.getAttribute('height'),
+              delivery: mf.getAttribute('delivery'),
+              bitrate: mf.getAttribute('bitrate')
+            });
+          });
+
+          // Parse tracking events
+          const trackingEvents = inline.querySelectorAll('Tracking');
+          trackingEvents.forEach(te => {
+            const event = te.getAttribute('event');
+            if (!adData.trackingEvents[event]) {
+              adData.trackingEvents[event] = [];
+            }
+            adData.trackingEvents[event].push(te.textContent.trim());
+          });
+
+          // Parse click tracking
+          const clickThrough = inline.querySelector('ClickThrough');
+          if (clickThrough) {
+            adData.clickThrough = clickThrough.textContent.trim();
+          }
+
+          const clickTracking = inline.querySelectorAll('ClickTracking');
+          clickTracking.forEach(ct => {
+            adData.clickTracking.push(ct.textContent.trim());
+          });
+
+          log('VAST parsed successfully');
+          return adData;
+
+        } catch (error) {
+          log(`Error parsing VAST: ${error.message}`);
+          throw error;
+        }
+      }
+
+      getTextContent(parent, tagName) {
+        const element = parent.querySelector(tagName);
+        return element ? element.textContent.trim() : null;
+      }
+
+      parseDuration(duration) {
+        if (!duration) return 0;
+        const parts = duration.split(':');
+        const hours = parseInt(parts[0]) || 0;
+        const minutes = parseInt(parts[1]) || 0;
+        const seconds = parseFloat(parts[2]) || 0;
+        return hours * 3600 + minutes * 60 + seconds;
+      }
+    }
+
+    // VAST Player
+    class VASTPlayer {
+      constructor(videoElement, containerElement) {
+        this.video = videoElement;
+        this.container = containerElement;
+        this.adData = null;
+        this.trackingFired = {};
+      }
+
+      async loadAd(adData) {
+        this.adData = adData;
+        this.trackingFired = {};
+
+        // Display ad info
+        const duration = this.parseDuration(adData.duration);
+        adDetails.innerHTML = `
+          Title: ${adData.title || 'Unknown'}<br>
+          Duration: ${duration > 0 ? duration.toFixed(1) + ' seconds' : 'Unknown'}<br>
+          Media Files: ${adData.mediaFiles.length}<br>
+          Tracking Events: ${Object.keys(adData.trackingEvents).length}
+        `;
+
+        // Select best media file (prefer MP4)
+        const mediaFile = this.selectMediaFile(adData.mediaFiles);
+        if (!mediaFile) {
+          throw new Error('No suitable media file found');
+        }
+
+        log(`Selected media: ${mediaFile.type} (${mediaFile.width}x${mediaFile.height})`);
+
+        // Load video
+        this.video.src = mediaFile.url;
+        
+        // Show video when loaded
+        this.video.addEventListener('loadeddata', () => {
+          this.video.classList.add('loaded');
+        }, { once: true });
+
+        // Set up event listeners
+        this.setupEventListeners();
+
+        // Fire impression
+        this.fireTracking('impression');
+
+        // Play video
+        try {
+          await this.video.play();
+          log('Ad playback started');
+        } catch (error) {
+          log(`Playback error: ${error.message}`);
+        }
+      }
+
+      selectMediaFile(mediaFiles) {
+        // Prefer progressive MP4
+        const mp4 = mediaFiles.find(mf => 
+          mf.type && mf.type.includes('mp4') && mf.delivery === 'progressive'
+        );
+        if (mp4) return mp4;
+
+        // Fall back to any progressive delivery
+        const progressive = mediaFiles.find(mf => mf.delivery === 'progressive');
+        if (progressive) return progressive;
+
+        // Fall back to first available
+        return mediaFiles[0];
+      }
+
+      parseDuration(duration) {
+        if (!duration) return 0;
+        const parts = duration.split(':');
+        const hours = parseInt(parts[0]) || 0;
+        const minutes = parseInt(parts[1]) || 0;
+        const seconds = parseFloat(parts[2]) || 0;
+        return hours * 3600 + minutes * 60 + seconds;
+      }
+
+      setupEventListeners() {
+        // Start event
+        this.video.addEventListener('playing', () => {
+          if (!this.trackingFired.start) {
+            log('Ad started');
+            this.fireTracking('start');
+            this.trackingFired.start = true;
+          }
+        });
+
+        // Progress events
+        this.video.addEventListener('timeupdate', () => {
+          if (!this.video.duration) return;
+          
+          const progress = this.video.currentTime / this.video.duration;
+          
+          if (progress >= 0.25 && !this.trackingFired.firstQuartile) {
+            log('First quartile');
+            this.fireTracking('firstQuartile');
+            this.trackingFired.firstQuartile = true;
+          }
+          if (progress >= 0.5 && !this.trackingFired.midpoint) {
+            log('Midpoint');
+            this.fireTracking('midpoint');
+            this.trackingFired.midpoint = true;
+          }
+          if (progress >= 0.75 && !this.trackingFired.thirdQuartile) {
+            log('Third quartile');
+            this.fireTracking('thirdQuartile');
+            this.trackingFired.thirdQuartile = true;
+          }
+        });
+
+        // Complete event
+        this.video.addEventListener('ended', () => {
+          log('Ad complete');
+          this.fireTracking('complete');
+        });
+
+        // Error event
+        this.video.addEventListener('error', (e) => {
+          log(`Video error: ${this.video.error?.message || 'Unknown error'}`);
+          this.fireTracking('error');
+        });
+
+        // Pause/Resume
+        this.video.addEventListener('pause', () => {
+          if (!this.video.ended) {
+            this.fireTracking('pause');
+          }
+        });
+
+        this.video.addEventListener('play', () => {
+          if (this.trackingFired.start && !this.video.ended) {
+            this.fireTracking('resume');
+          }
+        });
+
+        // Mute/Unmute
+        this.video.addEventListener('volumechange', () => {
+          if (this.video.muted) {
+            this.fireTracking('mute');
+          } else {
+            this.fireTracking('unmute');
+          }
+        });
+      }
+
+      fireTracking(eventName) {
+        if (!this.adData || !this.adData.trackingEvents[eventName]) return;
+
+        const urls = this.adData.trackingEvents[eventName];
+        log(`Firing ${eventName} tracking (${urls.length} URLs)`);
+        
+        urls.forEach(url => {
+          // Use Image object for tracking pixels
+          const img = new Image();
+          img.src = url;
+        });
+      }
+    }
+
+    // Initialize
+    const vastParser = new VASTParser();
+    const vastPlayer = new VASTPlayer(content, adContainer);
+
+    // Load tag button
+    document.querySelector('.gradient-btn').onclick = async () => {
+      const tagUrl = document.getElementById('tag').value.trim();
+      if (!tagUrl) {
+        log('Enter a VAST tag URL');
+        return;
+      }
+
+      log('=== Loading VAST Tag ===');
+      adDetails.textContent = 'Loading ad info...';
+
+      try {
+        const adData = await vastParser.parseVAST(tagUrl);
+        await vastPlayer.loadAd(adData);
+      } catch (error) {
+        log(`Failed to load ad: ${error.message}`);
+        adDetails.textContent = `Error: ${error.message}`;
+      }
+    };
+
+    // Clear logs
     document.getElementById('clearLogs').onclick = () => {
       logs.textContent = '';
     };
 
+    // Refresh
+    document.getElementById('refresh').onclick = () => {
+      logs.textContent = '';
+      adDetails.textContent = 'No ad loaded yet.';
+      document.getElementById('tag').value = '';
+      resizeTextarea(tagInput);
+      content.pause();
+      content.src = '';
+      content.classList.remove('loaded');
+      content.load();
+    };
+
+    // Macro replace
+    document.getElementById('macroReplace').onclick = () => {
+      const tag = document.getElementById('tag');
+      const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
+      tag.value = updated;
+      resizeTextarea(tag);
+      log('Replaced %%...%% macros with [...]');
+    };
+
+    // Textarea auto-resize
     const tagInput = document.getElementById('tag');
+
     function resizeTextarea(el) {
       const style = window.getComputedStyle(el);
       const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
@@ -475,29 +768,15 @@
       el.style.height = 'auto';
       const newHeight = el.scrollHeight + border;
       el.style.height = currentHeight + 'px';
-      requestAnimationFrame(() => { el.style.height = newHeight + 'px'; });
+      requestAnimationFrame(() => {
+        el.style.height = newHeight + 'px';
+      });
     }
+
     resizeTextarea(tagInput);
     tagInput.addEventListener('input', () => resizeTextarea(tagInput));
 
-    document.getElementById('macroReplace').onclick = () => {
-      const tag = tagInput;
-      const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
-      tag.value = updated;
-      resizeTextarea(tag);
-      log('Replaced %%…%% macros with […]');
-    };
-
-    document.getElementById('refresh').onclick = () => {
-      logs.textContent = '';
-      adDetails.textContent = 'No ad loaded yet.';
-      tagInput.value = '';
-      resizeTextarea(tagInput);
-      player.pause();
-      player.currentTime(0);
-      player.load();
-      player.ima && player.ima.reset();
-    };
+    log('VAST Tester ready');
   </script>
 </body>
 </html>
