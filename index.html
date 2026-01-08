@@ -9,7 +9,7 @@
   <link rel="icon" href="/check_circle_100dp_1F1F1F_FILL0_wght400_GRAD0_opsz48.png" type="image/png">
 
   <!-- Video.js CSS -->
-  <link href="https://vjs.zencdn.net/8.14.1/video-js.css" rel="stylesheet" />
+  <link href="https://vjs.zencdn.net/8.20.1/video-js.css" rel="stylesheet" />
 
   <style>
     body {
@@ -282,6 +282,17 @@
       width: 100%;
       height: 100%;
       border-radius: inherit;
+      background-color: transparent !important;
+    }
+
+    .video-js .vjs-poster,
+    .video-js .vjs-tech {
+      background-color: transparent !important;
+    }
+
+    .video-js .vjs-control-bar,
+    .video-js .vjs-big-play-button {
+      display: none !important;
     }
 
     @media (max-width: 1600px) {
@@ -351,37 +362,12 @@
       .left > div:last-child {
         align-self: stretch;
       }
-
-      /* Make the Video.js player background transparent */
-        .video-js {
-        background-color: transparent !important;
-        }
-
-        /* Remove poster background */
-        .video-js .vjs-poster {
-        background-color: transparent !important;
-        }
-
-        /* Ensure the video element itself is transparent when no video */
-        .video-js .vjs-tech {
-        background-color: transparent !important;
-        }
-
-        .video-js .vjs-control-bar {
-        background: rgba(0,0,0,0.2); /* semi-transparent, or 0 for fully invisible */
-        }
-
-        /* Hide the default play button overlay */
-        .video-js .vjs-big-play-button {
-        display: none !important;
-        }
     }
   </style>
 </head>
 
 <body>
   <div class="page">
-    
     <header>
       <h1>Vastify</h1>
       <h2>VAST tag tester</h2>
@@ -399,7 +385,6 @@
             </div>
           </div>
         </div>
-
         <div id="macroReplace" class="macro-action">Fix third-party macros</div>
 
         <div id="info">
@@ -418,8 +403,8 @@
         <div id="player">
           <video
             id="content"
-            class="video-js vjs-default-skin"
-            controls
+            class="video-js"
+            playsinline
             preload="auto"
             poster="https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif">
           </video>
@@ -432,72 +417,57 @@
     </footer>
   </div>
 
-  <!-- Video.js and VAST Plugin -->
-  <script src="https://vjs.zencdn.net/8.14.1/video.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@6.9.0/dist/videojs-contrib-ads.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/videojs-vast-plugin@2.0.2/dist/videojs-vast-plugin.min.js"></script>
+  <!-- Video.js & plugins -->
+  <script src="https://vjs.zencdn.net/8.20.1/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@6.10.0/dist/videojs.ads.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/videojs-ima@1.12.0/dist/videojs.ima.min.js"></script>
 
   <script>
     const logs = document.getElementById('logs');
     const adDetails = document.getElementById('ad-details');
-    const tagInput = document.getElementById('tag');
-
-    const log = (...a) => {
-      logs.textContent += a.join(' ') + '\n';
-      logs.scrollTop = logs.scrollHeight;
-    };
+    const log = (...a)=>{logs.textContent += a.join(' ') + '\n'; logs.scrollTop=logs.scrollHeight;}
 
     const player = videojs('content', {
+      controls: false,
       autoplay: false,
-      controls: true,
+      muted: true,
       preload: 'auto'
     });
 
     document.getElementsByClassName('gradient-btn')[0].onclick = () => {
-      const tagUrl = tagInput.value.trim();
+      const tagUrl = document.getElementById('tag').value.trim();
       if (!tagUrl) return log('Enter a VAST tag URL');
-      log('Requesting:', tagUrl);
+
+      log('Requesting VAST tag:', tagUrl);
       adDetails.textContent = 'Loading ad info...';
 
-      player.vastClient({
+      player.ima({
         adTagUrl: tagUrl,
-        playAdAlways: true,
-        verbosity: 3
+        debug: true
       });
 
-      player.on('adstart', () => {
-        const ad = player.vastClient.getCurrentAd();
+      player.ima.requestAds();
+      player.play();
+
+      player.ima.on('adsready', () => log('Ad ready to play'));
+      player.ima.on('adstart', () => {
+        log('Ad started');
+        const ad = player.ima.getAdsManager().getCurrentAd();
         if (ad) {
-          adDetails.innerHTML = `
-            Title: ${ad.title || 'Unknown'}<br>
-            Duration: ${ad.duration || 'Unknown'} seconds
-          `;
-          log('Ad started:', ad.title || 'Unknown', ad.duration + 's');
+          const title = ad.getTitle ? ad.getTitle() : 'Unknown';
+          const duration = ad.getDuration ? ad.getDuration() : 'Unknown';
+          adDetails.innerHTML = `Title: ${title}<br>Duration: ${duration} seconds`;
         }
       });
-
-      player.on('adend', () => log('Ad complete'));
-      player.on('adskip', () => log('Ad skipped'));
-      player.on('aderror', (e) => log('Ad error', e));
+      player.ima.on('adend', () => log('Ad ended'));
+      player.ima.on('aderror', (err) => log('Ad error', err));
     };
 
-    document.getElementById('clearLogs').onclick = () => logs.textContent = '';
-
-    document.getElementById('macroReplace').onclick = () => {
-      const tag = tagInput;
-      const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
-      tag.value = updated;
-      log('Replaced %%…%% macros with […]');
-    };
-
-    document.getElementById('refresh').onclick = () => {
+    document.getElementById('clearLogs').onclick = () => {
       logs.textContent = '';
-      adDetails.textContent = 'No ad loaded yet.';
-      tagInput.value = '';
-      player.reset();
     };
 
-    // Textarea auto-resize
+    const tagInput = document.getElementById('tag');
     function resizeTextarea(el) {
       const style = window.getComputedStyle(el);
       const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
@@ -505,11 +475,29 @@
       el.style.height = 'auto';
       const newHeight = el.scrollHeight + border;
       el.style.height = currentHeight + 'px';
-      requestAnimationFrame(() => el.style.height = newHeight + 'px');
+      requestAnimationFrame(() => { el.style.height = newHeight + 'px'; });
     }
-
     resizeTextarea(tagInput);
     tagInput.addEventListener('input', () => resizeTextarea(tagInput));
+
+    document.getElementById('macroReplace').onclick = () => {
+      const tag = tagInput;
+      const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
+      tag.value = updated;
+      resizeTextarea(tag);
+      log('Replaced %%…%% macros with […]');
+    };
+
+    document.getElementById('refresh').onclick = () => {
+      logs.textContent = '';
+      adDetails.textContent = 'No ad loaded yet.';
+      tagInput.value = '';
+      resizeTextarea(tagInput);
+      player.pause();
+      player.currentTime(0);
+      player.load();
+      player.ima && player.ima.reset();
+    };
   </script>
 </body>
 </html>
