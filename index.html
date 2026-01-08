@@ -272,7 +272,7 @@
       border-radius: 10px;
       overflow: hidden;
       transition: all 0.4s ease;
-      background: url('https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif') center/contain no-repeat;
+      background: url('https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif') center/cover no-repeat;
     }
 
     video {
@@ -446,7 +446,9 @@
         log(`Fetching VAST from: ${url}`);
         
         try {
-          const response = await fetch(url);
+          // Use CORS proxy to bypass CORS restrictions
+          const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+          const response = await fetch(proxyUrl);
           const text = await response.text();
           const parser = new DOMParser();
           const xml = parser.parseFromString(text, 'text/xml');
