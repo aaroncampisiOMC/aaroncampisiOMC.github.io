@@ -482,12 +482,12 @@
           // Check for XML parsing errors
           const parserError = xml.querySelector('parsererror');
           if (parserError) {
-            throw new Error('⚠️ XML parsing error');
+            throw new Error('XML parsing error');
           }
 
           const vast = xml.querySelector('VAST');
           if (!vast) {
-            throw new Error('⚠️ Invalid VAST response');
+            throw new Error('Invalid VAST response');
           }
 
           const version = vast.getAttribute('version');
@@ -855,15 +855,20 @@
 
     // Refresh
     document.getElementById('refresh').onclick = () => {
-      logs.innerHTML = '';
-      adDetails.innerHTML = 'No ad loaded yet.';
-      document.getElementById('tag').value = '';
-      content.pause();
-      content.removeAttribute('src');
-      content.classList.remove('loaded');
-      content.load();
-      adContainer.classList.remove('clickable');
-      adContainer.onclick = null; // Clear the click handler
+    // Fade out video smoothly
+    content.classList.remove('loaded');
+    
+    // Wait for fade animation to complete before resetting
+    setTimeout(() => {
+        logs.innerHTML = '';
+        adDetails.innerHTML = 'No ad loaded yet.';
+        document.getElementById('tag').value = '';
+        content.pause();
+        content.removeAttribute('src');
+        content.load();
+        adContainer.classList.remove('clickable');
+        adContainer.onclick = null;
+    }, 300); // 300ms matches the opacity transition duration in CSS
     };
 
     // Macro replace
