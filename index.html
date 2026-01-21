@@ -492,7 +492,7 @@
           // Check for wrapper (redirect)
           const wrapper = xml.querySelector('Wrapper');
           if (wrapper) {
-            log('➡️ VAST Wrapper detected, following redirect...');
+            log('↪️ VAST Wrapper detected, following redirect...');
             const vastAdTagURI = wrapper.querySelector('VASTAdTagURI');
             if (vastAdTagURI) {
               const redirectUrl = vastAdTagURI.textContent.trim();
@@ -645,14 +645,14 @@
         this.setupEventListeners();
 
         // Fire impression
-        this.fireTracking('impression');
+        // this.fireTracking('impression');
 
         // Play video
         try {
           await this.video.play();
-          log('✨ Ad playback started');
+          // log('Ad playback started');
         } catch (error) {
-          log(`⚠️ Playback error: ${error.message}`);
+          // log(`⚠️ Playback error: ${error.message}`);
         }
       }
 
@@ -711,7 +711,7 @@
         // Start event
         this.video.addEventListener('playing', () => {
           if (!this.trackingFired.start) {
-            log('✨ Ad started');
+            log('✅▶️ Ad started');
             this.fireTracking('start');
             this.trackingFired.start = true;
           }
@@ -724,17 +724,17 @@
           const progress = this.video.currentTime / this.video.duration;
           
           if (progress >= 0.25 && !this.trackingFired.firstQuartile) {
-            log('✅ First quartile');
+            log('✅🕒 First quartile');
             this.fireTracking('firstQuartile');
             this.trackingFired.firstQuartile = true;
           }
           if (progress >= 0.5 && !this.trackingFired.midpoint) {
-            log('✅ Midpoint');
+            log('✅🕕 Midpoint');
             this.fireTracking('midpoint');
             this.trackingFired.midpoint = true;
           }
           if (progress >= 0.75 && !this.trackingFired.thirdQuartile) {
-            log('✅ Third quartile');
+            log('✅🕘 Third quartile');
             this.fireTracking('thirdQuartile');
             this.trackingFired.thirdQuartile = true;
           }
@@ -742,7 +742,7 @@
 
         // Complete event
         this.video.addEventListener('ended', () => {
-          log('✅ Ad complete');
+          log('✅🏁 Ad complete');
           this.fireTracking('complete');
         });
 
@@ -811,8 +811,8 @@
         const adData = await vastParser.parseVAST(tagUrl);
         await vastPlayer.loadAd(adData);
       } catch (error) {
-        log(`Failed to load ad: ${error.message}`);
-        adDetails.textContent = `Error: ${error.message}`;
+        // log(`Failed to load ad: ${error.message}`);
+        adDetails.textContent = `Failed to load ad: ${error.message}`;
       }
     };
 
