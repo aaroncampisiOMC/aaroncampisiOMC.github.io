@@ -6,6 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="icon" href="/check_circle_100dp_1F1F1F_FILL0_wght400_GRAD0_opsz48.png" type="image/png">
   <style>
     body {
@@ -224,7 +225,7 @@
       font-weight: 400;
       white-space: pre-wrap;
       font-size: 0.75rem;
-      height: 140px;
+      height: 150px;
       overflow: auto;
       margin-top: 20px;
       padding: 16px 20px;
@@ -233,6 +234,13 @@
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
+
+    #logs .material-icons {
+      font-family: 'Material Icons';
+      font-size: 0.875rem;
+      vertical-align: middle;
+      color: #4CAF50;
+}
 
     #clearLogs,
     #refresh,
@@ -311,6 +319,10 @@
       height: 100%;
       pointer-events: auto;
       z-index: 2;
+      cursor: default;
+    }
+
+    #ad-container.clickable {
       cursor: pointer;
     }
 
@@ -431,7 +443,7 @@
       </div>
 
       <footer>
-        <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">OMG Facilitator Digital Operations</p>
+        <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">Omnicom Media OMG Facilitator Digital Operations</p>
       </footer>
   
   </div>
@@ -442,8 +454,20 @@
     const logs = document.getElementById('logs');
     const adDetails = document.getElementById('ad-details');
     const log = (...a) => {
-      logs.textContent += a.join(' ') + '\n';
-      logs.scrollTop = logs.scrollHeight;
+    const text = a.join(' ');
+    const iconPattern = /^(check_circle|done|check|task_alt)\s/;
+    
+    if (iconPattern.test(text)) {
+        const iconName = text.match(iconPattern)[1];
+        const restOfText = text.replace(iconPattern, '');
+        const span = document.createElement('span');
+        span.innerHTML = `<span class="material-icons">${iconName}</span> ${restOfText}`;
+        logs.appendChild(span);
+        logs.appendChild(document.createTextNode('\n'));
+    } else {
+        logs.textContent += text + '\n';
+    }
+    logs.scrollTop = logs.scrollHeight;
     };
 
     // Custom VAST Parser
@@ -609,11 +633,16 @@
 
         // Display ad info
         const duration = this.parseDuration(adData.duration);
+        const displayUrl = finalUrl.length > 60 ? finalUrl.substring(0, 57) + '...' : finalUrl;
+        const urlHtml = finalUrl !== 'None' 
+            ? `<a href="${finalUrl}" target="_blank" title="${finalUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">${displayUrl}</a>`
+            : finalUrl;
+
         adDetails.innerHTML = `
-          Compatibility: ${adData.title || 'Unknown'}<br>
-          Duration: ${duration > 0 ? duration.toFixed(1) + ' seconds' : 'Unknown'}<br>
-          Click-through: ${finalUrl.length > 60 ? finalUrl.substring(0, 57) + '...' : finalUrl}
-        `;
+            Compatibility: ${adData.title || 'Unknown'}<br>
+            Duration: ${duration > 0 ? Math.round(duration) + ' seconds' : 'Unknown'}<br>
+            Click-through: ${urlHtml}
+            `;
 
         // Select best media file (prefer MP4)
         const mediaFile = this.selectMediaFile(adData.mediaFiles);
@@ -671,6 +700,12 @@
       }
 
       setupEventListeners() {
+        // Add clickable cursor if there's a click-through URL
+        if (this.adData && this.adData.clickThrough) {
+          this.container.classList.add('clickable');
+        } else {
+          this.container.classList.remove('clickable');
+        }
         // Click-through handling
         this.container.onclick = () => {
           if (this.adData && this.adData.clickThrough) {
@@ -695,7 +730,7 @@
         // Start event
         this.video.addEventListener('playing', () => {
           if (!this.trackingFired.start) {
-            log('Ad started');
+            log('check_circle Ad started');
             this.fireTracking('start');
             this.trackingFired.start = true;
           }
@@ -708,17 +743,17 @@
           const progress = this.video.currentTime / this.video.duration;
           
           if (progress >= 0.25 && !this.trackingFired.firstQuartile) {
-            log('First quartile');
+            log('check_circle First quartile');
             this.fireTracking('firstQuartile');
             this.trackingFired.firstQuartile = true;
           }
           if (progress >= 0.5 && !this.trackingFired.midpoint) {
-            log('Midpoint');
+            log('check_circle Midpoint');
             this.fireTracking('midpoint');
             this.trackingFired.midpoint = true;
           }
           if (progress >= 0.75 && !this.trackingFired.thirdQuartile) {
-            log('Third quartile');
+            log('check_circle Third quartile');
             this.fireTracking('thirdQuartile');
             this.trackingFired.thirdQuartile = true;
           }
@@ -726,7 +761,7 @@
 
         // Complete event
         this.video.addEventListener('ended', () => {
-          log('Ad complete');
+          log('check_circle Ad complete');
           this.fireTracking('complete');
         });
 
@@ -814,6 +849,7 @@
       content.removeAttribute('src');
       content.classList.remove('loaded');
       content.load();
+      adContainer.classList.remove('clickable');
     };
 
     // Macro replace
