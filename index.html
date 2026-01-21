@@ -235,13 +235,6 @@
       -ms-overflow-style: none;
     }
 
-    #logs .material-icons {
-      font-family: 'Material Icons';
-      font-size: 0.875rem;
-      vertical-align: middle;
-      color: #4CAF50;
-    }
-
     #clearLogs,
     #refresh,
     .macro-action {
@@ -443,7 +436,7 @@
       </div>
 
       <footer>
-        <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">Omnicom Media OMG Facilitator Digital Operations</p>
+        <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #888;">OMG Facilitator Digital Operations</p>
       </footer>
   
   </div>
@@ -454,21 +447,8 @@
     const logs = document.getElementById('logs');
     const adDetails = document.getElementById('ad-details');
     const log = (...a) => {
-    const text = a.join(' ');
-    const iconPattern = /^(check_circle|done|check|task_alt)\s/;
-    
-    const line = document.createElement('div');
-    
-    if (iconPattern.test(text)) {
-        const iconName = text.match(iconPattern)[1];
-        const restOfText = text.replace(iconPattern, '');
-        line.innerHTML = `<span class="material-icons">${iconName}</span> ${restOfText}`;
-    } else {
-        line.textContent = text;
-    }
-    
-    logs.appendChild(line);
-    logs.scrollTop = logs.scrollHeight;
+      logs.textContent += a.join(' ') + '\n';
+      logs.scrollTop = logs.scrollHeight;
     };
 
     // Custom VAST Parser
@@ -479,7 +459,7 @@
 
       async parseVAST(url, redirectCount = 0) {
         if (redirectCount >= this.maxRedirects) {
-          throw new Error('Max VAST redirects exceeded');
+          throw new Error('⚠️ Max VAST redirects exceeded');
         }
 
         log(`Fetching VAST from: ${url}`);
@@ -498,12 +478,12 @@
           // Check for XML parsing errors
           const parserError = xml.querySelector('parsererror');
           if (parserError) {
-            throw new Error('XML parsing error');
+            throw new Error('⚠️ XML parsing error');
           }
 
           const vast = xml.querySelector('VAST');
           if (!vast) {
-            throw new Error('Invalid VAST response');
+            throw new Error('⚠️ Invalid VAST response');
           }
 
           const version = vast.getAttribute('version');
@@ -512,7 +492,7 @@
           // Check for wrapper (redirect)
           const wrapper = xml.querySelector('Wrapper');
           if (wrapper) {
-            log('VAST Wrapper detected, following redirect...');
+            log('➡️ VAST Wrapper detected, following redirect...');
             const vastAdTagURI = wrapper.querySelector('VASTAdTagURI');
             if (vastAdTagURI) {
               const redirectUrl = vastAdTagURI.textContent.trim();
@@ -569,11 +549,11 @@
             adData.clickTracking.push(ct.textContent.trim());
           });
 
-          log('VAST parsed successfully');
+          log('✅ VAST parsed successfully');
           return adData;
 
         } catch (error) {
-          log(`Error parsing VAST: ${error.message}`);
+          log(`⚠️ Error parsing VAST: ${error.message}`);
           throw error;
         }
       }
@@ -648,7 +628,7 @@
         // Select best media file (prefer MP4)
         const mediaFile = this.selectMediaFile(adData.mediaFiles);
         if (!mediaFile) {
-          throw new Error('No suitable media file found');
+          throw new Error('⚠️ No suitable media file found');
         }
 
         log(`Selected media: ${mediaFile.type} (${mediaFile.width}x${mediaFile.height})`);
@@ -670,9 +650,9 @@
         // Play video
         try {
           await this.video.play();
-          log('Ad playback started');
+          log('✨ Ad playback started');
         } catch (error) {
-          log(`Playback error: ${error.message}`);
+          log(`⚠️ Playback error: ${error.message}`);
         }
       }
 
@@ -731,7 +711,7 @@
         // Start event
         this.video.addEventListener('playing', () => {
           if (!this.trackingFired.start) {
-            log('check_circle Ad started');
+            log('✨ Ad started');
             this.fireTracking('start');
             this.trackingFired.start = true;
           }
@@ -744,17 +724,17 @@
           const progress = this.video.currentTime / this.video.duration;
           
           if (progress >= 0.25 && !this.trackingFired.firstQuartile) {
-            log('check_circle First quartile');
+            log('✅ First quartile');
             this.fireTracking('firstQuartile');
             this.trackingFired.firstQuartile = true;
           }
           if (progress >= 0.5 && !this.trackingFired.midpoint) {
-            log('check_circle Midpoint');
+            log('✅ Midpoint');
             this.fireTracking('midpoint');
             this.trackingFired.midpoint = true;
           }
           if (progress >= 0.75 && !this.trackingFired.thirdQuartile) {
-            log('check_circle Third quartile');
+            log('✅ Third quartile');
             this.fireTracking('thirdQuartile');
             this.trackingFired.thirdQuartile = true;
           }
@@ -762,7 +742,7 @@
 
         // Complete event
         this.video.addEventListener('ended', () => {
-          log('check_circle Ad complete');
+          log('✅ Ad complete');
           this.fireTracking('complete');
         });
 
@@ -770,7 +750,7 @@
         this.video.addEventListener('error', (e) => {
           // Only log error if video has a valid source
           if (this.video.src && this.video.src !== window.location.href) {
-            log(`Video error: ${this.video.error?.message || 'Unknown error'}`);
+            log(`⚠️ Video error: ${this.video.error?.message || '⚠️ Unknown error'}`);
             this.fireTracking('error');
           }
         });
@@ -838,20 +818,20 @@
 
     // Clear logs
     document.getElementById('clearLogs').onclick = () => {
-        logs.innerHTML = '';
+      logs.textContent = '';
     };
 
     // Refresh
     document.getElementById('refresh').onclick = () => {
-        logs.innerHTML = '';
-        adDetails.innerHTML = 'No ad loaded yet.';
-        document.getElementById('tag').value = '';
-        content.pause();
-        content.removeAttribute('src');
-        content.classList.remove('loaded');
-        content.load();
-        adContainer.classList.remove('clickable');
-        };
+      logs.textContent = '';
+      adDetails.textContent = 'No ad loaded yet.';
+      document.getElementById('tag').value = '';
+      content.pause();
+      content.removeAttribute('src');
+      content.classList.remove('loaded');
+      content.load();
+      adContainer.classList.remove('clickable');
+    };
 
     // Macro replace
     document.getElementById('macroReplace').onclick = () => {
