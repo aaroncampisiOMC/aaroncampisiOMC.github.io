@@ -686,25 +686,14 @@
       }
 
       setupEventListeners() {
-        // Only add event listeners once
-        if (this.eventListenersAdded) {
-          // Just update clickable state
-          if (this.adData && this.adData.clickThrough) {
-            this.container.classList.add('clickable');
-          } else {
-            this.container.classList.remove('clickable');
-          }
-          return;
-        }
-        this.eventListenersAdded = true;
-  
         // Add clickable cursor if there's a click-through URL
         if (this.adData && this.adData.clickThrough) {
           this.container.classList.add('clickable');
         } else {
           this.container.classList.remove('clickable');
         }
-        // Click-through handling
+        
+        // Always update click-through handler (needs to run every time for new ad data)
         this.container.onclick = () => {
           if (this.adData && this.adData.clickThrough) {
             log(`👆 Click-through to: ${this.adData.clickThrough}`);
@@ -724,6 +713,12 @@
             log('No click-through URL available');
           }
         };
+        
+        // Only add video event listeners once (to prevent duplicate events)
+        if (this.eventListenersAdded) {
+          return;
+        }
+        this.eventListenersAdded = true;
 
         // Start event
         this.video.addEventListener('playing', () => {
