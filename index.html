@@ -224,7 +224,7 @@
       font-family: 'Inter', Arial, sans-serif;
       font-weight: 400;
       white-space: pre-wrap;
-      font-size: 0.75rem;
+      font-size: 0.875rem;
       height: 150px;
       overflow: auto;
       margin-top: 20px;
@@ -695,8 +695,28 @@
         
         // Always update click-through handler (needs to run every time for new ad data)
         this.container.onclick = () => {
-          if (this.adData && this.adData.clickThrough) {
-            log(`👆 Click-through to: ${this.adData.clickThrough}`);
+        if (this.adData && this.adData.clickThrough) {
+            // Extract final destination URL
+            let finalUrl = this.adData.clickThrough;
+            try {
+            if (this.adData.clickThrough.includes('adurl=')) {
+                const adUrlPart = this.adData.clickThrough.split('adurl=')[1];
+                finalUrl = decodeURIComponent(adUrlPart);
+            } else {
+                const url = new URL(this.adData.clickThrough);
+                const redirectParam = url.searchParams.get('url') || 
+                                    url.searchParams.get('redirect') || 
+                                    url.searchParams.get('dest') ||
+                                    url.searchParams.get('u');
+                if (redirectParam) {
+                finalUrl = decodeURIComponent(redirectParam);
+                }
+            }
+            } catch (e) {
+            // If parsing fails, use original URL
+            }
+            
+            log(`👆 Click-through to: ${finalUrl}`);
             
             // Fire click tracking pixels
             if (this.adData.clickTracking && this.adData.clickTracking.length > 0) {
@@ -710,7 +730,7 @@
             // Open landing page
             window.open(this.adData.clickThrough, '_blank');
           } else {
-            log('No click-through URL available');
+            log('⚠️ No click-through URL available');
           }
         };
         
