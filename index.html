@@ -584,7 +584,8 @@
         this.container = containerElement;
         this.adData = null;
         this.trackingFired = {};
-      }
+        this.eventListenersAdded = false;
+      } 
 
       async loadAd(adData) {
         this.adData = adData;
@@ -685,6 +686,18 @@
       }
 
       setupEventListeners() {
+        // Only add event listeners once
+        if (this.eventListenersAdded) {
+          // Just update clickable state
+          if (this.adData && this.adData.clickThrough) {
+            this.container.classList.add('clickable');
+          } else {
+            this.container.classList.remove('clickable');
+          }
+          return;
+        }
+        this.eventListenersAdded = true;
+  
         // Add clickable cursor if there's a click-through URL
         if (this.adData && this.adData.clickThrough) {
           this.container.classList.add('clickable');
@@ -804,11 +817,11 @@
     document.querySelector('.gradient-btn').onclick = async () => {
       const tagUrl = document.getElementById('tag').value.trim();
       if (!tagUrl) {
-        log('Enter a VAST tag URL');
+        log('ℹ️ Enter a VAST tag URL');
         return;
       }
 
-      log('🔁 Loading VAST Tag...');
+      log('🔁 Loading VAST tag...');
       adDetails.textContent = 'Loading ad info...';
 
       try {
