@@ -447,7 +447,11 @@
     const logs = document.getElementById('logs');
     const adDetails = document.getElementById('ad-details');
     const log = (...a) => {
-      logs.textContent += a.join(' ') + '\n';
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString('en-US', { hour12: false });
+      const line = document.createElement('div');
+      line.innerHTML = `<span style="color: #999;">[${timestamp}]</span> ${a.join(' ')}`;
+      logs.appendChild(line);
       logs.scrollTop = logs.scrollHeight;
     };
 
@@ -462,7 +466,7 @@
           throw new Error('⚠️ Max VAST redirects exceeded');
         }
 
-        log(`Fetching VAST from: ${url}`);
+        log(`➡️ Fetching VAST from: ${url}`);
         
         try {
           // Use CORS proxy to bypass CORS restrictions
@@ -487,7 +491,7 @@
           }
 
           const version = vast.getAttribute('version');
-          log(`VAST version: ${version}`);
+          log(`🔢 VAST version: ${version}`);
 
           // Check for wrapper (redirect)
           const wrapper = xml.querySelector('Wrapper');
@@ -631,7 +635,7 @@
           throw new Error('⚠️ No suitable media file found');
         }
 
-        log(`Selected media: ${mediaFile.type} (${mediaFile.width}x${mediaFile.height})`);
+        log(`🖥️ Selected media: ${mediaFile.type} (${mediaFile.width}x${mediaFile.height})`);
 
         // Load video
         this.video.src = mediaFile.url;
@@ -645,7 +649,7 @@
         this.setupEventListeners();
 
         // Fire impression
-        // this.fireTracking('impression');
+        this.fireTracking('impression');
 
         // Play video
         try {
@@ -690,7 +694,7 @@
         // Click-through handling
         this.container.onclick = () => {
           if (this.adData && this.adData.clickThrough) {
-            log(`Click-through to: ${this.adData.clickThrough}`);
+            log(`👆 Click-through to: ${this.adData.clickThrough}`);
             
             // Fire click tracking pixels
             if (this.adData.clickTracking && this.adData.clickTracking.length > 0) {
@@ -711,7 +715,7 @@
         // Start event
         this.video.addEventListener('playing', () => {
           if (!this.trackingFired.start) {
-            log('✅▶️ Ad started');
+            log('▶️ Ad started');
             this.fireTracking('start');
             this.trackingFired.start = true;
           }
@@ -724,17 +728,17 @@
           const progress = this.video.currentTime / this.video.duration;
           
           if (progress >= 0.25 && !this.trackingFired.firstQuartile) {
-            log('✅🕒 First quartile');
+            log('🕒 First quartile');
             this.fireTracking('firstQuartile');
             this.trackingFired.firstQuartile = true;
           }
           if (progress >= 0.5 && !this.trackingFired.midpoint) {
-            log('✅🕕 Midpoint');
+            log('🕕 Midpoint');
             this.fireTracking('midpoint');
             this.trackingFired.midpoint = true;
           }
           if (progress >= 0.75 && !this.trackingFired.thirdQuartile) {
-            log('✅🕘 Third quartile');
+            log('🕘 Third quartile');
             this.fireTracking('thirdQuartile');
             this.trackingFired.thirdQuartile = true;
           }
@@ -742,7 +746,7 @@
 
         // Complete event
         this.video.addEventListener('ended', () => {
-          log('✅🏁 Ad complete');
+          log('🏁 Ad complete');
           this.fireTracking('complete');
         });
 
@@ -804,7 +808,7 @@
         return;
       }
 
-      log('Loading VAST Tag...');
+      log('🔁 Loading VAST Tag...');
       adDetails.textContent = 'Loading ad info...';
 
       try {
@@ -818,19 +822,20 @@
 
     // Clear logs
     document.getElementById('clearLogs').onclick = () => {
-      logs.textContent = '';
+      logs.innerHTML = '';
     };
 
     // Refresh
     document.getElementById('refresh').onclick = () => {
-      logs.textContent = '';
-      adDetails.textContent = 'No ad loaded yet.';
+      logs.innerHTML = '';
+      adDetails.innerHTML = 'No ad loaded yet.';
       document.getElementById('tag').value = '';
       content.pause();
       content.removeAttribute('src');
       content.classList.remove('loaded');
       content.load();
       adContainer.classList.remove('clickable');
+      adContainer.onclick = null; // Clear the click handler
     };
 
     // Macro replace
@@ -838,7 +843,7 @@
       const tag = document.getElementById('tag');
       const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
       tag.value = updated;
-      log('Replaced %%...%% macros with [...]');
+      log('ℹ️ Replaced %%...%% macros with [...]');
     };
   </script>
 </body>
