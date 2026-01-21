@@ -240,7 +240,7 @@
       font-size: 0.875rem;
       vertical-align: middle;
       color: #4CAF50;
-}
+    }
 
     #clearLogs,
     #refresh,
@@ -457,16 +457,17 @@
     const text = a.join(' ');
     const iconPattern = /^(check_circle|done|check|task_alt)\s/;
     
+    const line = document.createElement('div');
+    
     if (iconPattern.test(text)) {
         const iconName = text.match(iconPattern)[1];
         const restOfText = text.replace(iconPattern, '');
-        const span = document.createElement('span');
-        span.innerHTML = `<span class="material-icons">${iconName}</span> ${restOfText}`;
-        logs.appendChild(span);
-        logs.appendChild(document.createTextNode('\n'));
+        line.innerHTML = `<span class="material-icons">${iconName}</span> ${restOfText}`;
     } else {
-        logs.textContent += text + '\n';
+        line.textContent = text;
     }
+    
+    logs.appendChild(line);
     logs.scrollTop = logs.scrollHeight;
     };
 
@@ -837,20 +838,20 @@
 
     // Clear logs
     document.getElementById('clearLogs').onclick = () => {
-      logs.textContent = '';
+        logs.innerHTML = '';
     };
 
     // Refresh
     document.getElementById('refresh').onclick = () => {
-      logs.textContent = '';
-      adDetails.textContent = 'No ad loaded yet.';
-      document.getElementById('tag').value = '';
-      content.pause();
-      content.removeAttribute('src');
-      content.classList.remove('loaded');
-      content.load();
-      adContainer.classList.remove('clickable');
-    };
+        logs.innerHTML = '';
+        adDetails.innerHTML = 'No ad loaded yet.';
+        document.getElementById('tag').value = '';
+        content.pause();
+        content.removeAttribute('src');
+        content.classList.remove('loaded');
+        content.load();
+        adContainer.classList.remove('clickable');
+        };
 
     // Macro replace
     document.getElementById('macroReplace').onclick = () => {
