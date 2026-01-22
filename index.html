@@ -846,6 +846,20 @@
     const vastParser = new VASTParser();
     const vastPlayer = new VASTPlayer(content, adContainer);
 
+    // Prevent line breaks in tag input
+    document.getElementById('tag').addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      const cleanText = text.replace(/[\r\n]+/g, '');
+      document.execCommand('insertText', false, cleanText);
+    });
+
+    document.getElementById('tag').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+      }
+    });
+
     // Load tag button
     document.querySelector('.gradient-btn').onclick = async () => {
       const tagUrl = document.getElementById('tag').value.trim();
@@ -894,4 +908,3 @@
   </script>
 </body>
 </html>
-
