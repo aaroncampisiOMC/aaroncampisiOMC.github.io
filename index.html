@@ -210,6 +210,14 @@
       font-size: 0.875rem;
       line-height: 1.6;
       height: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #ad-details {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     #info h3 {
@@ -416,7 +424,7 @@
 
           <div id="info">
             <h3>Ad Info</h3>
-            <div id="ad-details">Load tag to see info</div>
+            <div id="ad-details">Load tag to see ad info</div>
           </div>
 
           <div id="logs"></div>
@@ -452,7 +460,11 @@
       const now = new Date();
       const timestamp = now.toLocaleTimeString('en-US', { hour12: false });
       const line = document.createElement('div');
-      line.innerHTML = `<span style="color: #999;">[${timestamp}]</span> ${a.join(' ')}`;
+      const message = a.join(' ').replace(/[\r\n]+/g, '');
+      line.innerHTML = `<span style="color: #999;">[${timestamp}]</span> ${message}`;
+      line.style.whiteSpace = 'nowrap';
+      line.style.overflow = 'hidden';
+      line.style.textOverflow = 'ellipsis';
       logs.appendChild(line);
       logs.scrollTop = logs.scrollHeight;
     };
@@ -800,7 +812,7 @@
         this.video.addEventListener('error', (e) => {
           // Only log error if video has a valid source
           if (this.video.src && this.video.src !== window.location.href) {
-            log(`⚠️ Video error: ${this.video.error?.message || '⚠️ Unknown error'}`);
+            log(`⚠️ Video error: ${this.video.error?.message || 'unknown error'}`);
             this.fireTracking('error');
           }
         });
@@ -888,7 +900,7 @@
     // Refresh
     document.getElementById('refresh').onclick = () => {
       logs.innerHTML = '';
-      adDetails.innerHTML = 'Load tag to see info';
+      adDetails.innerHTML = 'Load tag to see ad info';
       document.getElementById('tag').value = '';
       content.pause();
       content.removeAttribute('src');
