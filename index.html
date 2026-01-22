@@ -270,8 +270,8 @@
 
     #player {
       position: relative;
-      width: 768px;
-      height: 432px;
+      width: 775px;
+      height: 436px;
       border-radius: 10px;
       overflow: hidden;
       transition: all 0.4s ease;
@@ -367,18 +367,20 @@
 
       #player {
         width: 100%;
-        max-width: 768px;
+        max-width: 600px;
         height: auto;
         aspect-ratio: 16 / 9;
         transition: all 0.4s ease;
       }
 
-      #logs {
-        height: 160px;
+      #info {
+        height: 132px;
+        margin-top: 20px;
+        box-sizing: border-box;
       }
 
-      #info,
       #logs {
+        height: 182px;
         margin-top: 20px;
         box-sizing: border-box;
       }
@@ -414,7 +416,7 @@
 
           <div id="info">
             <h3>Ad Info</h3>
-            <div id="ad-details">No ad loaded yet.</div>
+            <div id="ad-details">Load tag to see info</div>
           </div>
 
           <div id="logs"></div>
@@ -619,15 +621,24 @@
 
         // Display ad info
         const duration = this.parseDuration(adData.duration);
-        const displayUrl = finalUrl.length > 60 ? finalUrl.substring(0, 57) + '...' : finalUrl;
-        const urlHtml = finalUrl !== 'None' 
-            ? `<a href="${finalUrl}" target="_blank" title="${finalUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">${displayUrl}</a>`
-            : finalUrl;
+        // Remove Google tracking parameters for display only
+        let cleanUrl = finalUrl;
+        if (finalUrl !== 'None') {
+          try {
+            cleanUrl = finalUrl.split('?dclid')[0].split('&dclid')[0];
+          } catch (e) {
+            cleanUrl = finalUrl;
+          }
+        }
+        const displayUrl = cleanUrl.length > 60 ? cleanUrl.substring(0, 57) + '...' : cleanUrl;
+        const urlHtml = cleanUrl !== 'None' 
+            ? `<a href="${finalUrl}" target="_blank" title="${cleanUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">${displayUrl}</a>`
+            : cleanUrl;
 
         adDetails.innerHTML = `
             Compatibility: ${adData.title || 'Unknown'}<br>
             Duration: ${duration > 0 ? Math.round(duration) + ' seconds' : 'Unknown'}<br>
-            Click-through: ${urlHtml}
+            Click-through URL: ${urlHtml}
             `;
 
         // Select best media file (prefer MP4)
@@ -716,7 +727,14 @@
             // If parsing fails, use original URL
             }
             
-            log(`👆 Click-through to: ${finalUrl}`);
+            // Remove Google tracking parameters for display in log
+            let cleanLogUrl = finalUrl;
+            try {
+              cleanLogUrl = finalUrl.split('?dclid')[0].split('&dclid')[0];
+            } catch (e) {
+              cleanLogUrl = finalUrl;
+            }
+            log(`👆 Click-through to: ${cleanLogUrl}`);
             
             // Fire click tracking pixels
             if (this.adData.clickTracking && this.adData.clickTracking.length > 0) {
@@ -856,7 +874,7 @@
     // Refresh
     document.getElementById('refresh').onclick = () => {
       logs.innerHTML = '';
-      adDetails.innerHTML = 'No ad loaded yet.';
+      adDetails.innerHTML = 'Load tag to see info';
       document.getElementById('tag').value = '';
       content.pause();
       content.removeAttribute('src');
