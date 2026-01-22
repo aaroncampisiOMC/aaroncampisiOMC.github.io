@@ -510,7 +510,7 @@
           // Check for wrapper (redirect)
           const wrapper = xml.querySelector('Wrapper');
           if (wrapper) {
-            log('↪️ VAST Wrapper detected, following redirect...');
+            log('↪️ Tag wrapping detected, following redirect...');
             const vastAdTagURI = wrapper.querySelector('VASTAdTagURI');
             if (vastAdTagURI) {
               const redirectUrl = vastAdTagURI.textContent.trim();
@@ -920,3 +920,4 @@
   </script>
 </body>
 </html>
+
