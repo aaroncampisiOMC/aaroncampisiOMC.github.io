@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
   <link rel="icon" href="/check_circle_100dp_1F1F1F_FILL0_wght400_GRAD0_opsz48.png" type="image/png">
   <style>
     body {
@@ -229,10 +230,10 @@
     }
 
     #logs {
-      font-family: 'Inter', Arial, sans-serif;
+      font-family: 'JetBrains Mono', monospace;
       font-weight: 400;
       white-space: pre-wrap;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       height: 150px;
       overflow: auto;
       margin-top: 20px;
@@ -480,14 +481,10 @@
           throw new Error('⚠️ Max VAST redirects exceeded');
         }
 
-        log(`➡️ Fetching VAST from: ${url}`);
+        log(`Fetching VAST from: ${url}`);
         
         try {
           // Use CORS proxy to bypass CORS restrictions
-          // Alternative proxies if one is blocked:
-          // const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-          // const proxyUrl = 'https://cors-anywhere.herokuapp.com/' + url;
-          // https://royal-hill-c2b9.aaron-campisi.workers.dev/
           const CORS_PROXY = 'https://vastify-proxy.aaron-campisi.workers.dev';
           const proxyUrl = `${CORS_PROXY}?url=${encodeURIComponent(url)}`;
           const response = await fetch(proxyUrl);
@@ -498,21 +495,21 @@
           // Check for XML parsing errors
           const parserError = xml.querySelector('parsererror');
           if (parserError) {
-            throw new Error('XML parsing error');
+            throw new Error('⚠️ XML parsing error');
           }
 
           const vast = xml.querySelector('VAST');
           if (!vast) {
-            throw new Error('Invalid VAST response');
+            throw new Error('⚠️ Invalid VAST response');
           }
 
           const version = vast.getAttribute('version');
-          log(`🔢 VAST version: ${version}`);
+          log(`VAST version: ${version}`);
 
           // Check for wrapper (redirect)
           const wrapper = xml.querySelector('Wrapper');
           if (wrapper) {
-            log('↪️ Tag wrapping detected, following redirect...');
+            log('Tag wrapping detected, following redirect...');
             const vastAdTagURI = wrapper.querySelector('VASTAdTagURI');
             if (vastAdTagURI) {
               const redirectUrl = vastAdTagURI.textContent.trim();
@@ -523,7 +520,7 @@
           // Parse inline ad
           const inline = xml.querySelector('InLine');
           if (!inline) {
-            throw new Error('No InLine ad found');
+            throw new Error('⚠️ No InLine ad found');
           }
 
           const adData = {
@@ -569,7 +566,7 @@
             adData.clickTracking.push(ct.textContent.trim());
           });
 
-          log('✅ VAST parsed successfully');
+          log('VAST parsed successfully');
           return adData;
 
         } catch (error) {
@@ -661,7 +658,7 @@
           throw new Error('⚠️ No suitable media file found');
         }
 
-        log(`🖥️ Selected media: ${mediaFile.type} (${mediaFile.width}x${mediaFile.height})`);
+        log(`Selected media: ${mediaFile.type} (${mediaFile.width}x${mediaFile.height})`);
 
         // Load video
         this.video.src = mediaFile.url;
@@ -748,7 +745,7 @@
             } catch (e) {
               cleanLogUrl = finalUrl;
             }
-            log(`👆 Click-through to: ${cleanLogUrl}`);
+            log(`Click-through to: ${cleanLogUrl}`);
             
             // Fire click tracking pixels
             if (this.adData.clickTracking && this.adData.clickTracking.length > 0) {
@@ -775,7 +772,7 @@
         // Start event
         this.video.addEventListener('playing', () => {
           if (!this.trackingFired.start) {
-            log('▶️ Ad started');
+            log('Ad started');
             this.fireTracking('start');
             this.trackingFired.start = true;
           }
@@ -788,17 +785,17 @@
           const progress = this.video.currentTime / this.video.duration;
           
           if (progress >= 0.25 && !this.trackingFired.firstQuartile) {
-            log('🕒 First quartile');
+            log('First quartile');
             this.fireTracking('firstQuartile');
             this.trackingFired.firstQuartile = true;
           }
           if (progress >= 0.5 && !this.trackingFired.midpoint) {
-            log('🕕 Midpoint');
+            log('Midpoint');
             this.fireTracking('midpoint');
             this.trackingFired.midpoint = true;
           }
           if (progress >= 0.75 && !this.trackingFired.thirdQuartile) {
-            log('🕘 Third quartile');
+            log('Third quartile');
             this.fireTracking('thirdQuartile');
             this.trackingFired.thirdQuartile = true;
           }
@@ -806,7 +803,7 @@
 
         // Complete event
         this.video.addEventListener('ended', () => {
-          log('🏁 Ad complete');
+          log('Ad complete');
           this.fireTracking('complete');
         });
 
@@ -846,7 +843,7 @@
         if (!this.adData || !this.adData.trackingEvents[eventName]) return;
 
         const urls = this.adData.trackingEvents[eventName];
-        log(`Firing ${eventName} tracking (${urls.length} URLs)`);
+        /*log(`Firing ${eventName} tracking (${urls.length} URLs)`);*/
         
         urls.forEach(url => {
           // Use Image object for tracking pixels
@@ -878,11 +875,11 @@
     document.querySelector('.gradient-btn').onclick = async () => {
       const tagUrl = document.getElementById('tag').value.trim();
       if (!tagUrl) {
-        log('ℹ️ Enter a VAST tag URL');
+        log('Enter a VAST tag URL');
         return;
       }
 
-      log('🔁 Loading VAST tag...');
+      log('Loading VAST tag...');
       adDetails.textContent = 'Loading ad info...';
 
       try {
@@ -917,7 +914,7 @@
       const tag = document.getElementById('tag');
       const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
       tag.value = updated;
-      log('ℹ️ Replaced %%...%% macros with [...]');
+      log('Replaced %%...%% macros with [...]');
     };
   </script>
 </body>
