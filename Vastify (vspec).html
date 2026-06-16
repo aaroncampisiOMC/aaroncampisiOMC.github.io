@@ -1,0 +1,942 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Vastify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <link rel="icon" href="/check_circle_100dp_1F1F1F_FILL0_wght400_GRAD0_opsz48.png" type="image/png">
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background-color: #F9F9F9;
+      color: #aeaeb2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    .page {
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+      width: 100%;
+      justify-content: center;
+      gap: 0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      top: 40px;
+      width: 100%;
+      max-width: 1500px;
+      gap: 12px;
+      margin-bottom: auto;
+      padding-top: 20px;
+      transition: all 0.4s ease;
+    }
+
+    footer {
+      margin-top: auto;
+    }
+
+    h1 {
+      font-family: 'DM Sans', Arial, sans-serif;
+      font-size: 3rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, #444, #444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+
+    h2 {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      background: linear-gradient(90deg, #444, #444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      letter-spacing: -0.5px;
+      position: relative;
+      top: 4px;
+    }
+
+    .container {
+      flex: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      width: 100%;
+      max-width: 1500px;
+      margin-top: 0;
+      transition: all 0.4s ease;
+    }
+
+    .left,
+    .right {
+      position: sticky;
+      top: 250px;
+      align-self: flex-start;
+    }
+
+    .left {
+      flex: 1;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .right {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    #controls {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    #tag {
+      width: 100%;
+      display: block;
+      resize: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      height: 44px;
+      padding: 12px 16px;
+      border-radius: 100px;
+      border: 0 solid #bbb;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      outline: none;
+      box-sizing: border-box;
+      background: #f3f3f3;
+      transition: border 0.2s, box-shadow 0.2s;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      color: #444;
+    }
+
+    #tag::placeholder {
+      color: #aeaeb2;
+    }
+
+    #tag::-webkit-scrollbar {
+      display: none;
+    }
+
+    #tag:focus {
+      border-color: #4286f433;
+      box-shadow: 0 0 0 1px #4286f433;
+    }
+
+    .gradient-btn {
+      position: relative;
+      height: 44px;
+      padding: 12px 24px;
+      font-family: 'Inter', Arial, sans-serif;
+      background: #F9F9F9;
+      border-radius: 100px;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      overflow: hidden;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .gradient-btn::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: conic-gradient(#29f8ff10, #277dff20, #a700ff30, #ff2fc140, #29f8ff);
+      animation: spin 3s linear infinite; /* always spinning */
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .gradient-btn.active::before {
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+
+    .gradient-btn::after {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      background: #f3f3f3;
+      border-radius: 100px;
+      z-index: 1;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+    }
+
+    .gradient-btn:hover::after {
+      background: #e9e9e9;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      color: #aeaeb2;
+      font-size: 1rem;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #info {
+      margin-top: 20px;
+      background: #f3f3f3;
+      border-radius: 20px;
+      padding: 16px 20px;
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 400;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      height: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #ad-details {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #info h3 {
+      font-family: 'Inter', Arial, sans-serif;
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 400;
+      color: #aeaeb2;
+    }
+
+    #logs {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 400;
+      white-space: pre-wrap;
+      font-size: 0.75rem;
+      height: 150px;
+      overflow: auto;
+      margin-top: 20px;
+      padding: 16px 20px;
+      border-radius: 20px;
+      background: #f3f3f3;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    #clearLogs,
+    #refresh,
+    .macro-action {
+      font-family: 'Inter', Arial, sans-serif;
+      padding: 8px 18px;
+      background: transparent;
+      color: #aeaeb2;
+      border: 0 solid #ccc;
+      border-radius: 100px;
+      font-size: 0.875rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+    }
+
+    #clearLogs, 
+    #refresh {
+      margin: 5px 0 0;
+      text-align: center;
+    }
+
+    .macro-action {
+      margin-top: 5px;
+      text-align: left;
+      width: fit-content;
+    }
+
+    #clearLogs:hover,
+    #refresh:hover,
+    .macro-action:hover {
+      color: #4286f433;
+    }
+
+    #player {
+      position: relative;
+      width: 774px;
+      height: 435px;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      background: url('https://i.pinimg.com/originals/54/58/a1/5458a14ae4c8f07055b7441ff0f234cf.gif') center/contain no-repeat;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: inherit;
+      background: transparent;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    video.loaded {
+      opacity: 1;
+    }
+
+    video::-webkit-media-controls {
+      display: none !important;
+    }
+
+    video::-webkit-media-controls-enclosure {
+      display: none !important;
+    }
+
+    video::-webkit-media-controls-panel {
+      display: none !important;
+    }
+
+    #ad-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+      z-index: 2;
+      cursor: default;
+    }
+
+    #ad-container.clickable {
+      cursor: pointer;
+    }
+
+    @media (max-width: 1600px) {
+      .container {
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 50px;
+        align-items: center;
+        transition: all 0.4s ease;
+      }
+
+      .left,
+      .right {
+        position: static;
+        width: 100%;
+      }
+
+      .left {
+        max-width: 600px;
+        align-items: center;
+        margin: 0 auto;
+      }
+
+      header {
+        max-width: 600px;
+      }
+
+      #controls,
+      #tag,
+      #request,
+      #info,
+      #logs {
+        width: 100%;
+        max-width: 600px;
+      }
+
+      #controls {
+        flex-direction: row;
+      }
+
+      #request {
+        text-align: center;
+      }
+
+      .macro-action {
+        align-self: flex-start;
+      }
+
+      #player {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        transition: all 0.4s ease;
+      }
+
+      #info {
+        height: 132px;
+        margin-top: 20px;
+        box-sizing: border-box;
+      }
+
+      #logs {
+        height: 182px;
+        margin-top: 20px;
+        box-sizing: border-box;
+      }
+
+      .left > div:last-child {
+        align-self: stretch;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    
+    <header>
+      <h1>Vastify</h1>
+      <h2>VAST tag tester</h2>
+    </header>
+
+      <div class="container">
+        <div class="left">
+          <div id="controls">
+            <div id="tag-wrapper" style="flex:1; display:block;">
+              <textarea id="tag" placeholder="Paste VAST tag URL here"></textarea>
+            </div>
+            <button class="gradient-btn">
+              <div class="content">
+                <span>Submit</span>
+              </div>
+            </button>
+          </div>
+          <!-- <div id="macroReplace" class="macro-action">Fix third-party macros</div> -->
+
+          <div id="info">
+            <h3>Ad Info</h3>
+            <div id="ad-details">Load tag to see ad info</div>
+          </div>
+
+          <div id="logs"></div>
+            <div style="display: flex; gap: 8px; justify-content: left;">
+              <button id="clearLogs">Clear log</button>
+              <button id="refresh">Refresh</button>
+            </div>
+        </div>
+
+        <div class="right">
+          <div id="player">
+            <video id="content"
+            playsinline
+            preload="auto">
+            </video>
+            <div id="ad-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p style="font-family: 'Inter', Arial, sans-serif; font-size: 0.75rem; color: #aeaeb2;">Omnicom Media Digital Operations</p>
+      </footer>
+  
+  </div>
+
+  <script>
+    const content = document.getElementById('content');
+    const adContainer = document.getElementById('ad-container');
+    const logs = document.getElementById('logs');
+    const adDetails = document.getElementById('ad-details');
+    const log = (...a) => {
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString('en-US', { hour12: false });
+      const line = document.createElement('div');
+      const message = a.join(' ').replace(/[\r\n]+/g, '');
+      line.innerHTML = `<span style="color: #999;">[${timestamp}]</span> ${message}`;
+      line.style.whiteSpace = 'nowrap';
+      line.style.overflow = 'hidden';
+      line.style.textOverflow = 'ellipsis';
+      logs.appendChild(line);
+      logs.scrollTop = logs.scrollHeight;
+    };
+
+    // Custom VAST Parser
+    class VASTParser {
+      constructor() {
+        this.maxRedirects = 5;
+      }
+
+      async parseVAST(url, redirectCount = 0) {
+        if (redirectCount >= this.maxRedirects) {
+          throw new Error('⚠️ Max VAST redirects exceeded');
+        }
+
+        log(`Fetching VAST from: ${url}`);
+        
+        try {
+          // Use CORS proxy to bypass CORS restrictions
+          const CORS_PROXY = 'https://vastify-proxy.aaron-campisi.workers.dev';
+          const proxyUrl = `${CORS_PROXY}?url=${encodeURIComponent(url)}`;
+          const response = await fetch(proxyUrl);
+          const text = await response.text();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, 'text/xml');
+
+          // Check for XML parsing errors
+          const parserError = xml.querySelector('parsererror');
+          if (parserError) {
+            throw new Error('⚠️ XML parsing error');
+          }
+
+          const vast = xml.querySelector('VAST');
+          if (!vast) {
+            throw new Error('⚠️ Invalid VAST response');
+          }
+
+          const version = vast.getAttribute('version');
+          log(`VAST version: ${version}`);
+
+          // Check for wrapper (redirect)
+          const wrapper = xml.querySelector('Wrapper');
+          if (wrapper) {
+            log('Tag wrapping detected, following redirect...');
+            const vastAdTagURI = wrapper.querySelector('VASTAdTagURI');
+            if (vastAdTagURI) {
+              const redirectUrl = vastAdTagURI.textContent.trim();
+              return await this.parseVAST(redirectUrl, redirectCount + 1);
+            }
+          }
+
+          // Parse inline ad
+          const inline = xml.querySelector('InLine');
+          if (!inline) {
+            throw new Error('⚠️ No InLine ad found');
+          }
+
+          const adData = {
+            title: this.getTextContent(inline, 'AdTitle'),
+            duration: this.getTextContent(inline, 'Duration'),
+            mediaFiles: [],
+            trackingEvents: {},
+            clickThrough: null,
+            clickTracking: []
+          };
+
+          // Parse media files
+          const mediaFiles = inline.querySelectorAll('MediaFile');
+          mediaFiles.forEach(mf => {
+            adData.mediaFiles.push({
+              url: mf.textContent.trim(),
+              type: mf.getAttribute('type'),
+              width: mf.getAttribute('width'),
+              height: mf.getAttribute('height'),
+              delivery: mf.getAttribute('delivery'),
+              bitrate: mf.getAttribute('bitrate')
+            });
+          });
+
+          // Parse tracking events
+          const trackingEvents = inline.querySelectorAll('Tracking');
+          trackingEvents.forEach(te => {
+            const event = te.getAttribute('event');
+            if (!adData.trackingEvents[event]) {
+              adData.trackingEvents[event] = [];
+            }
+            adData.trackingEvents[event].push(te.textContent.trim());
+          });
+
+          // Parse click tracking
+          const clickThrough = inline.querySelector('ClickThrough');
+          if (clickThrough) {
+            adData.clickThrough = clickThrough.textContent.trim();
+          }
+
+          const clickTracking = inline.querySelectorAll('ClickTracking');
+          clickTracking.forEach(ct => {
+            adData.clickTracking.push(ct.textContent.trim());
+          });
+
+          log('VAST parsed successfully');
+          return adData;
+
+        } catch (error) {
+          log(`⚠️ Error parsing VAST: ${error.message}`);
+          throw error;
+        }
+      }
+
+      getTextContent(parent, tagName) {
+        const element = parent.querySelector(tagName);
+        return element ? element.textContent.trim() : null;
+      }
+
+      parseDuration(duration) {
+        if (!duration) return 0;
+        const parts = duration.split(':');
+        const hours = parseInt(parts[0]) || 0;
+        const minutes = parseInt(parts[1]) || 0;
+        const seconds = parseFloat(parts[2]) || 0;
+        return hours * 3600 + minutes * 60 + seconds;
+      }
+    }
+
+    // VAST Player
+    class VASTPlayer {
+      constructor(videoElement, containerElement) {
+        this.video = videoElement;
+        this.container = containerElement;
+        this.adData = null;
+        this.trackingFired = {};
+        this.eventListenersAdded = false;
+      } 
+
+      async loadAd(adData) {
+        this.adData = adData;
+        this.trackingFired = {};
+
+        // Extract final destination URL from click-through
+        let finalUrl = 'None';
+        if (adData.clickThrough) {
+          try {
+            // Look for adurl= parameter (common in DoubleClick/Google ads)
+            if (adData.clickThrough.includes('adurl=')) {
+              const adUrlPart = adData.clickThrough.split('adurl=')[1];
+              finalUrl = decodeURIComponent(adUrlPart);
+            } else {
+              // Fall back to checking URL parameters
+              const url = new URL(adData.clickThrough);
+              const redirectParam = url.searchParams.get('url') || 
+                                    url.searchParams.get('redirect') || 
+                                    url.searchParams.get('dest') ||
+                                    url.searchParams.get('u');
+              if (redirectParam) {
+                finalUrl = decodeURIComponent(redirectParam);
+              } else {
+                finalUrl = adData.clickThrough;
+              }
+            }
+          } catch (e) {
+            finalUrl = adData.clickThrough;
+          }
+        }
+
+        // Display ad info
+        const duration = this.parseDuration(adData.duration);
+        // Remove Google tracking parameters for display only
+        let cleanUrl = finalUrl;
+        if (finalUrl !== 'None') {
+          try {
+            cleanUrl = finalUrl.split('?dclid')[0].split('&dclid')[0];
+          } catch (e) {
+            cleanUrl = finalUrl;
+          }
+        }
+        const displayUrl = cleanUrl.length > 60 ? cleanUrl.substring(0, 57) + '...' : cleanUrl;
+        const urlHtml = cleanUrl !== 'None' 
+            ? `<a href="${finalUrl}" target="_blank" title="${cleanUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">${displayUrl}</a>`
+            : cleanUrl;
+
+        adDetails.innerHTML = `
+            Compatibility: ${adData.title || 'Unknown'}<br>
+            Duration: ${duration > 0 ? Math.round(duration) + ' seconds' : 'Unknown'}<br>
+            Click-through URL: ${urlHtml}
+            `;
+
+        // Select best media file (prefer MP4)
+        const mediaFile = this.selectMediaFile(adData.mediaFiles);
+        if (!mediaFile) {
+          throw new Error('⚠️ No suitable media file found');
+        }
+
+        log(`Selected media: ${mediaFile.type} (${mediaFile.width}x${mediaFile.height})`);
+
+        // Load video
+        this.video.src = mediaFile.url;
+        
+        // Show video when loaded
+        this.video.addEventListener('loadeddata', () => {
+          this.video.classList.add('loaded');
+        }, { once: true });
+
+        // Set up event listeners
+        this.setupEventListeners();
+
+        // Fire impression
+        this.fireTracking('impression');
+
+        // Play video
+        try {
+          await this.video.play();
+          // log('Ad playback started');
+        } catch (error) {
+          // log(`⚠️ Playback error: ${error.message}`);
+        }
+      }
+
+      selectMediaFile(mediaFiles) {
+        // Prefer progressive MP4
+        const mp4 = mediaFiles.find(mf => 
+          mf.type && mf.type.includes('mp4') && mf.delivery === 'progressive'
+        );
+        if (mp4) return mp4;
+
+        // Fall back to any progressive delivery
+        const progressive = mediaFiles.find(mf => mf.delivery === 'progressive');
+        if (progressive) return progressive;
+
+        // Fall back to first available
+        return mediaFiles[0];
+      }
+
+      parseDuration(duration) {
+        if (!duration) return 0;
+        const parts = duration.split(':');
+        const hours = parseInt(parts[0]) || 0;
+        const minutes = parseInt(parts[1]) || 0;
+        const seconds = parseFloat(parts[2]) || 0;
+        return hours * 3600 + minutes * 60 + seconds;
+      }
+
+      setupEventListeners() {
+        // Add clickable cursor if there's a click-through URL
+        if (this.adData && this.adData.clickThrough) {
+          this.container.classList.add('clickable');
+        } else {
+          this.container.classList.remove('clickable');
+        }
+        
+        // Always update click-through handler (needs to run every time for new ad data)
+        this.container.onclick = () => {
+        if (this.adData && this.adData.clickThrough) {
+            // Extract final destination URL
+            let finalUrl = this.adData.clickThrough;
+            try {
+            if (this.adData.clickThrough.includes('adurl=')) {
+                const adUrlPart = this.adData.clickThrough.split('adurl=')[1];
+                finalUrl = decodeURIComponent(adUrlPart);
+            } else {
+                const url = new URL(this.adData.clickThrough);
+                const redirectParam = url.searchParams.get('url') || 
+                                    url.searchParams.get('redirect') || 
+                                    url.searchParams.get('dest') ||
+                                    url.searchParams.get('u');
+                if (redirectParam) {
+                finalUrl = decodeURIComponent(redirectParam);
+                }
+            }
+            } catch (e) {
+            // If parsing fails, use original URL
+            }
+            
+            // Remove Google tracking parameters for display in log
+            let cleanLogUrl = finalUrl;
+            try {
+              cleanLogUrl = finalUrl.split('?dclid')[0].split('&dclid')[0];
+            } catch (e) {
+              cleanLogUrl = finalUrl;
+            }
+            log(`Click-through to: ${cleanLogUrl}`);
+            
+            // Fire click tracking pixels
+            if (this.adData.clickTracking && this.adData.clickTracking.length > 0) {
+              log(`Firing ${this.adData.clickTracking.length} click tracking URLs`);
+              this.adData.clickTracking.forEach(url => {
+                const img = new Image();
+                img.src = url;
+              });
+            }
+            
+            // Open landing page
+            window.open(this.adData.clickThrough, '_blank');
+          } else {
+            log('⚠️ No click-through URL available');
+          }
+        };
+        
+        // Only add video event listeners once (to prevent duplicate events)
+        if (this.eventListenersAdded) {
+          return;
+        }
+        this.eventListenersAdded = true;
+
+        // Start event
+        this.video.addEventListener('playing', () => {
+          if (!this.trackingFired.start) {
+            log('Ad started');
+            this.fireTracking('start');
+            this.trackingFired.start = true;
+          }
+        });
+
+        // Progress events
+        this.video.addEventListener('timeupdate', () => {
+          if (!this.video.duration) return;
+          
+          const progress = this.video.currentTime / this.video.duration;
+          
+          if (progress >= 0.25 && !this.trackingFired.firstQuartile) {
+            log('First quartile');
+            this.fireTracking('firstQuartile');
+            this.trackingFired.firstQuartile = true;
+          }
+          if (progress >= 0.5 && !this.trackingFired.midpoint) {
+            log('Midpoint');
+            this.fireTracking('midpoint');
+            this.trackingFired.midpoint = true;
+          }
+          if (progress >= 0.75 && !this.trackingFired.thirdQuartile) {
+            log('Third quartile');
+            this.fireTracking('thirdQuartile');
+            this.trackingFired.thirdQuartile = true;
+          }
+        });
+
+        // Complete event
+        this.video.addEventListener('ended', () => {
+          log('Ad complete');
+          this.fireTracking('complete');
+        });
+
+        // Error event
+        this.video.addEventListener('error', (e) => {
+          // Only log error if video has a valid source
+          if (this.video.src && this.video.src !== window.location.href) {
+            log(`⚠️ Video error: ${this.video.error?.message || 'unknown error'}`);
+            this.fireTracking('error');
+          }
+        });
+
+        // Pause/Resume
+        this.video.addEventListener('pause', () => {
+          if (!this.video.ended) {
+            this.fireTracking('pause');
+          }
+        });
+
+        this.video.addEventListener('play', () => {
+          if (this.trackingFired.start && !this.video.ended) {
+            this.fireTracking('resume');
+          }
+        });
+
+        // Mute/Unmute
+        this.video.addEventListener('volumechange', () => {
+          if (this.video.muted) {
+            this.fireTracking('mute');
+          } else {
+            this.fireTracking('unmute');
+          }
+        });
+      }
+
+      fireTracking(eventName) {
+        if (!this.adData || !this.adData.trackingEvents[eventName]) return;
+
+        const urls = this.adData.trackingEvents[eventName];
+        /*log(`Firing ${eventName} tracking (${urls.length} URLs)`);*/
+        
+        urls.forEach(url => {
+          // Use Image object for tracking pixels
+          const img = new Image();
+          img.src = url;
+        });
+      }
+    }
+
+    // Initialize
+    const vastParser = new VASTParser();
+    const vastPlayer = new VASTPlayer(content, adContainer);
+
+    // Prevent line breaks in tag input
+    document.getElementById('tag').addEventListener('paste', (e) => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      const cleanText = text.replace(/[\r\n]+/g, '');
+      document.execCommand('insertText', false, cleanText);
+    });
+
+    document.getElementById('tag').addEventListener('input', () => {
+      const hasValue = document.getElementById('tag').value.trim().length > 0;
+      document.querySelector('.gradient-btn').classList.toggle('active', hasValue);
+    });
+
+        // Enter key on tag input triggers load
+    document.getElementById('tag').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.querySelector('.gradient-btn').click();
+      }
+    });
+
+    // Load tag button
+    document.querySelector('.gradient-btn').onclick = async () => {
+      const tagUrl = document.getElementById('tag').value.trim();
+      if (!tagUrl) {
+        log('Enter a VAST tag URL');
+        return;
+      }
+
+      log('Loading VAST tag...');
+      adDetails.textContent = 'Loading ad info...';
+
+      try {
+        const adData = await vastParser.parseVAST(tagUrl);
+        await vastPlayer.loadAd(adData);
+      } catch (error) {
+        // log(`Failed to load ad: ${error.message}`);
+        adDetails.textContent = `Failed to load ad: ${error.message}`;
+      }
+    };
+
+    // Clear logs
+    document.getElementById('clearLogs').onclick = () => {
+      logs.innerHTML = '';
+    };
+
+    // Refresh
+    document.getElementById('refresh').onclick = () => {
+      logs.innerHTML = '';
+      adDetails.innerHTML = 'Load tag to see ad info';
+      document.getElementById('tag').value = '';
+      content.pause();
+      content.removeAttribute('src');
+      content.classList.remove('loaded');
+      content.load();
+      adContainer.classList.remove('clickable');
+      adContainer.onclick = null; // Clear the click handler
+    };
+
+    // Macro replace
+    document.getElementById('macroReplace').onclick = () => {
+      const tag = document.getElementById('tag');
+      const updated = tag.value.replace(/%%(.*?)%%/g, (_, inner) => `[${inner}]`);
+      tag.value = updated;
+      log('Replaced %%...%% macros with [...]');
+    };
+
+
+  </script>
+</body>
+</html>

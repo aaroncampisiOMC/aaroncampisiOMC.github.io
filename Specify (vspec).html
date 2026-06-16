@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="/check_circle_100dp_1F1F1F_FILL0_wght400_GRAD0_opsz48.png" type="image/png">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f9f9f9;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.13);
+    --text: #444;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #aeaeb2;
+    --accent: #0071e3;
+    --accepted: #34c759;
+    --accepted-bg: rgba(52,199,89,0.1);
+    --possible: #ff9f0a;
+    --possible-bg: rgba(255,159,10,0.1);
+    --vpaid: #9300a0;
+    --unknown: #aeaeb2;
+    --unknown-bg: rgba(174,174,178,0.1);
+    --off-text: #aeaeb2;
+    --radius-sm: 8px;
+    --radius: 14px;
+    --radius-lg: 20px;
+  }
+
+  html {
+  scrollbar-gutter: stable;
+  scrollbar-width: none; /* Firefox */
+  }
+
+  /* Hide visually but keep space reserved */
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-y: scroll;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 24px 0;
+  }
+
+  .eyebrow {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+
+  .title {
+    font-family: 'DM Sans';
+    font-size: 3rem; font-weight: 600;
+    letter-spacing: -0.02em; line-height: 1.05;
+    color: var(--text); margin-bottom: 6px;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .subtitle {
+    font-size: 1.2rem; font-weight: 400;
+    letter-spacing: -0.03em;
+    color: var(--text-secondary);
+    line-height: 1.05;
+    align-self: center;
+    margin-top: 18px;
+    margin-bottom: 72px;
+  }
+
+  /* ── MEDIA TYPE TOGGLE ── */
+  .media-toggle {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px;
+    margin-bottom: 32px;
+    gap: 2px;
+  }
+
+  .media-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 8px 20px;
+    border-radius: 100px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px; font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .media-btn:hover { color: var(--text); }
+
+  .media-btn.active {
+    background: #99999940;
+    color: #444;
+  }
+
+  .media-btn svg {
+    width: 14px; height: 14px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .media-btn.active svg { opacity: 1; }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px;
+    margin-bottom: 52px;
+  }
+
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 500;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot-a { background: var(--accepted); }
+  .dot-p { background: var(--possible); }
+  .dot-u { background: var(--unknown); }
+  .dot-o { background: var(--text-tertiary); }
+
+  /* ── SECTION ── */
+  .section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+  }
+
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--text-tertiary); margin-bottom: 14px;
+  }
+
+  .publisher-grid {
+    display: flex; flex-wrap: wrap;
+    gap: 8px; margin-bottom: 40px;
+  }
+
+  /* ── PUBLISHER BUTTONS ── */
+  .pub-btn {
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 14px; font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .pub-btn:hover { color: var(--text); border-color: rgba(0,0,0,0.25); }
+
+  .pub-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .pub-btn.active.in-group { background: var(--accent); border-color: var(--accent); }
+  .pub-btn.sibling {
+    background: rgba(0,113,227,0.08);
+    border-color: rgba(0,113,227,0.3);
+    color: var(--accent);
+  }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .empty-state { padding: 300px 32px; text-align: center; }
+
+  .empty-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: var(--bg); margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+
+  .empty-state h3 { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .empty-state p  { font-size: 14px; color: var(--text-secondary); }
+
+  /* Panel header */
+  .panel-header {
+    padding: 24px 32px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 20px;
+  }
+
+  .panel-pub-name {
+    font-size: 22px; font-weight: 600;
+    letter-spacing: -0.015em; color: var(--text); margin-bottom: 6px;
+  }
+
+  .panel-sub { font-size: 13px; color: var(--text-secondary); }
+
+  .shared-notice {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 10px; padding: 5px 12px;
+    background: rgba(0,113,227,0.07);
+    border-radius: 100px;
+    font-size: 12px; font-weight: 500; color: var(--accent);
+  }
+
+  .shared-notice-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+  .stats { display: flex; gap: 24px; flex-shrink: 0; }
+  .stat  { text-align: right; }
+
+  .stat-num {
+    font-size: 26px; font-weight: 600;
+    letter-spacing: -0.02em; line-height: 1; margin-bottom: 2px;
+  }
+
+  .stat-label {
+    font-size: 11px; color: var(--text-tertiary);
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  .stat.a .stat-num { color: var(--accepted); }
+  .stat.p .stat-num { color: var(--possible); }
+  .stat.u .stat-num { color: var(--unknown); }
+  .stat.o .stat-num { color: var(--off-text); }
+  .stat.n .stat-num { color: var(--off-text); }
+
+  /* Notices */
+  .notice {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 32px;
+    font-size: 12px; font-weight: 500;
+  }
+
+  .notice-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .notice-amber {
+    background: #fff8f0;
+    border-bottom: 1px solid rgba(255,159,10,0.15);
+    color: #a05c00;
+  }
+  .notice-amber .notice-dot { background: var(--possible); }
+
+  .notice-purple {
+    background: #fcf0ff;
+    border-bottom: 1px solid rgba(255,159,10,0.15);
+    color: #9300a0;
+  }
+  .notice-purple .notice-dot { background: var(--vpaid); }  
+
+  .notice-red {
+    background: #fff5f5;
+    border-bottom: 1px solid rgba(255,59,48,0.15);
+    color: #c0392b;
+  }
+  .notice-red .notice-dot { background: #ff3b30; }
+
+  /* Table */
+  .col-header {
+    display: grid;
+    gap: 16px; padding: 10px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .col-header.video-cols { grid-template-columns: 90px 130px 140px 1fr; }
+  .col-header.audio-cols { grid-template-columns: 240px 2fr 1fr; }
+
+  .col-th {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary);
+  }
+
+  .tc-row {
+    display: grid;
+    gap: 16px; padding: 4px 32px; /* padding: 14px 32px */
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    transition: background 0.1s;
+    animation: fadeUp 0.25s ease both;
+  }
+
+  .tc-row.video-cols { grid-template-columns: 90px 130px 140px 1fr; }
+  .tc-row.audio-cols { grid-template-columns: 240px 2fr 1fr; }
+
+  .tc-row:last-child { border-bottom: none; }
+  .tc-row:hover { background: var(--bg); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .cell-label  { font-size: 13px; font-weight: 600; color: var(--text); }
+  .cell-value  { font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .cell-target { font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 100px;
+    font-size: 12px; font-weight: 500;
+  }
+
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .badge-a   { background: var(--accepted-bg); color: #1a7a34; }
+  .badge-a .badge-dot { background: var(--accepted); }
+  .badge-o   { background: #ffffff00; border: 1px solid var(--accepted-bg); color: #1a7a34; }
+  .badge-o .badge-dot { background: var(--accepted); }  
+  .badge-p   { background: var(--possible-bg); color: #a05c00; }
+  .badge-p .badge-dot { background: var(--possible); }
+  .badge-u   { background: var(--unknown-bg); color: #6e6e73; }
+  .badge-u .badge-dot { background: var(--unknown); }
+  .badge-off { color: var(--off-text); }
+  .badge-off .badge-dot { background: var(--text-tertiary); }
+
+  .tc-row.special .cell-label { color: var(--text-secondary); font-weight: 500; }
+
+  /* Panel footer */
+  .panel-footer {
+    padding: 4px 32px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: flex-end;
+  }
+
+  .ad-specs-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent);
+    text-decoration: none; padding: 7px 14px;
+    border-radius: var(--radius-sm); transition: background 0.15s;
+    cursor: pointer; border: none; background: none; font-family: inherit;
+  }
+
+  .ad-specs-btn:hover { background: rgba(0,113,227,0.07); }
+
+  .layout-columns {
+    padding-bottom: 48px;
+  }
+
+  @media (min-width: 900px) {
+    .layout-columns {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 64px;
+      align-items: start;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .title { font-size: 28px; }
+    .col-header.video-cols, .tc-row.video-cols { grid-template-columns: 70px 100px 110px 1fr; padding: 12px 20px; gap: 10px; }
+    .col-header.audio-cols, .tc-row.audio-cols { grid-template-columns: 120px 1fr 1fr; padding: 12px 20px; gap: 10px; }
+    .panel-header { flex-direction: column; }
+    .stats { flex-direction: row; }
+    .stat { text-align: left; }
+  }
+
+ 
+</style>
+</head>
+<body>
+
+<div class="header">
+  <!-- <div class="eyebrow">Ad Spec Visualiser</div> -->
+  <div class="title-row">
+    <div class="title">Specify</div>
+    <div class="subtitle">Ad Spec Viewer</div>
+  </div>
+
+  <div class="layout-columns">
+  <div class="left-col">
+    <div class="section-label" id="sectionLabel">Media Type</div>
+  <!-- Media type toggle -->
+  <div class="media-toggle">
+    <button class="media-btn active" id="btnVideo" onclick="switchMode('video')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="15" height="14" rx="2"/><path d="m17 9 5-3v12l-5-3V9Z"/></svg>
+      Video
+    </button>
+    <button class="media-btn" id="btnAudio" onclick="switchMode('audio')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Audio
+    </button>
+  </div>
+
+  <!-- Legend -->
+  <!-- <div class="legend" id="legend">
+    <div class="legend-item"><div class="legend-dot dot-a"></div> Accepted</div>
+    <div class="legend-item"><div class="legend-dot dot-p"></div> Possible</div>
+    <div class="legend-item"><div class="legend-dot dot-o"></div> Off</div>
+  </div>
+</div> -->
+
+<div class="section-label" id="sectionLabel">Publisher</div>
+  <div class="publisher-grid" id="publisherGrid"></div>
+  </div><!-- close left-col -->
+  <div class="right-col">
+  <div class="panel" id="panel">
+    <div class="empty-state">
+      <div class="empty-icon">◻</div>
+      <h3>No publisher selected</h3>
+      <p>Pick a publisher to see its settings.</p>
+    </div>
+  </div>
+  </div><!-- close right-col -->
+  </div><!-- close layout-columns -->
+</div>
+
+<script>
+// ─── VIDEO DATA ────────────────────────────────────────────────────────────
+
+const videoTranscodes = [
+  { type: 'MP4',    res: '480 × 270',   bitrate: '400 kbps' },
+  { type: 'MP4',    res: '640 × 360',   bitrate: '400 kbps' },
+  { type: 'MP4',    res: '640 × 360',   bitrate: '1000 kbps' },
+  { type: 'MP4',    res: '640 × 360',   bitrate: '1500 kbps' },
+  { type: 'MP4',    res: '640 × 480',   bitrate: '400 kbps' },
+  { type: 'MP4',    res: '720 × 600',   bitrate: '720 kbps' },
+  { type: 'MP4',    res: '854 × 480',   bitrate: '720 kbps' },
+  { type: 'MP4',    res: '960 × 540',   bitrate: '1250 kbps' },
+  { type: 'MP4',    res: '1024 × 576',  bitrate: '1500 kbps' },
+  { type: 'MP4',    res: '1280 × 720',  bitrate: '2048 kbps' },
+  { type: 'MP4',    res: '1920 × 1080', bitrate: '4096 kbps' },
+  { type: 'MP4',    res: '1920 × 1080', bitrate: '20480 kbps' },
+  { type: 'M3U8',   res: '—',           bitrate: '—', special: true },
+  { type: 'Source', res: '—',           bitrate: '—', special: true },
+];
+
+const videoPublishers = [
+  { name: 'Default',      specId: 'default',  adSpecs: 'https://support.google.com/campaignmanager/answer/3311603?hl=en',
+    s: ['A','A','A','A','A','A','A','A','A','A','A','A','','A'] },
+  { name: '7Plus',        specId: '7plus',    adSpecs: 'https://adspecs.sevenwestmedia.com.au/vast-guidelines/',
+    s: ['','A','A','A','','P','P','A','A','A','','','',''] },
+  { name: '9Now',         specId: '9now',     adSpecs: 'https://www.nineforbrands.com.au/ad-spec/video-in-stream-video-vast/',
+    s: ['','','A','A','','P','P','A','A','A','A','','',''] },
+  { name: '10Play',       specId: 'group10',  adSpecs: 'https://www.paramountanz.com.au/specs/digital/video/3rd-party-vast-specifications/',
+    s: ['A','A','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'SBS',          specId: 'sbs',      adSpecs: 'https://www.sbsmedia.com.au/wp-content/uploads/2024/04/SBS-Online-Advertising-Specifications-April24.pdf',
+    s: ['A','A','A','A','A','A','A','A','A','A','','','',''] },
+  { name: 'TheTradeDesk', specId: 'group10',  adSpecs: 'https://www.thetradedesk.com/assets/global/documents/Creative_Specifications-en.pdf',
+    s: ['A','A','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'Foxtel',       specId: 'foxtel',   adSpecs: 'https://www.foxtelmedia.com.au/digital-ad-specs/foxtel-video/',
+    s: ['','','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'Kayo',         specId: 'foxtel',   adSpecs: 'https://www.foxtelmedia.com.au/digital-ad-specs/kayo-video/',
+    s: ['','','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'Binge',        specId: 'foxtel',   adSpecs: 'https://www.foxtelmedia.com.au/digital-ad-specs/binge-video/',
+    s: ['','','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'Netflix',      specId: 'group10',  adSpecs: 'https://advertising.netflix.com/en-au/creative-specs', adgileWarning: true,
+    s: ['A','A','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'Amazon (Prime Video)',       specId: 'prime',    adSpecs: 'https://advertising.amazon.com/resources/ad-specs/dsp/video/streaming-tv-prime-video-ads', adgileWarning: true,
+    s: ['A','A','A','P','A','A','A','A','A','A','A','A','',''] },
+  { name: 'Twitch',       specId: 'twitch',   adSpecs: 'https://advertising.amazon.com/resources/ad-specs/twitch/premium-video', adgileWarning: true,
+    s: ['','A','','','','','A','','','A','A','','',''] },
+  { name: 'Amobee',       specId: 'group10',  adSpecs: 'https://www.amobee.com/wp-content/uploads/2018/12/Amobee-Guidelines-and-Specs-for-Digital-Advertising-Oct-2018.pdf',
+    s: ['A','A','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'InMobi',       specId: 'inmobi',   adSpecs: 'https://support.inmobi.com/advertise/ad-formats-and-creatives/ad-specifications/video#specifications',
+    s: ['A','A','A','P','A','A','A','P','A','','','','',''] },
+  { name: 'News Corp',    specId: 'newscorp', adSpecs: 'https://www.newscorpaustralia.com/digital-media-assets/video-in-stream-video-vast/',
+    s: ['A','A','A','A','A','A','A','A','A','','','','',''] },
+  { name: 'Paramount+',    specId: 'group10',  adSpecs: 'https://www.paramountanz.com.au/specs/digital/video/3rd-party-vast-specifications/',
+    s: ['A','A','A','A','A','A','A','A','A','A','A','A','',''] },
+  { name: 'Samba TV',     specId: 'samba',    adSpecs: 'https://www.samba.tv/business/ad-specs',
+    s: ['','','A','A','','A','A','A','A','','A','','',''] },
+  { name: 'TVNZ',         specId: 'tvnz',     adSpecs: 'https://sales.tvnz.co.nz/resources/ad-specs/tvnzplus/',
+    s: ['','','','','','','','','','','','A','',''] },
+];
+
+// ─── AUDIO DATA ────────────────────────────────────────────────────────────
+// Specs rows for audio panel
+// s values: 'A' = Accepted, 'P' = Possible, 'U' = Unknown, '' = Off/N/A
+
+const audioSpecs = [
+  { label: 'File Type',               key: 'fileType' },
+  { label: 'Duration',                key: 'duration' },
+  { label: 'Companion Banner Accepted',     key: 'companion' },
+  { label: 'Banner Size (Programmatic)', key: 'companionProg' },
+  { label: 'Banner Size (Direct)',       key: 'companionDirect' },
+];
+
+// For audio, each publisher has a value + status per spec row
+// status: 'A'=Accepted, 'P'=Possible, 'U'=Unknown
+const audioPublishers = [
+  {
+    name: 'ARN', specId: 'arn', adSpecs: 'https://arn.com.au/advertise-with-us/',
+    specs: {
+      fileType:        { value: 'MP3',      status: 'A' },
+      duration:        { value: '15s or 30s',  status: 'A' },
+      companion:       { value: 'Yes',      status: 'P' },
+      companionProg:   { value: '300×250',  status: 'A' },
+      companionDirect: { value: '300×250',  status: 'A' },
+    }
+  }, 
+  {
+    name: 'Listnr', specId: 'Listnr', adSpecs: 'https://advertise.listnr.com/ads/digital-advertising-guidelines/technical-guidelines/',
+    specs: {
+      fileType:        { value: 'MP3',      status: 'A' },
+      duration:        { value: '15s-30s',  status: 'A' },
+      companion:       { value: 'Yes',      status: 'A' },
+      companionProg:   { value: '300×250 (recommended), 640×640',  status: 'A' },
+      companionDirect: { value: '300×250 (recommended), 640×640',  status: 'A' },
+    }
+  }, 
+  {
+    name: 'Nova', specId: 'nova', adSpecs: 'https://www.novaentertainment.com.au/adspecs/',
+    specs: {
+      fileType:        { value: 'MP3',     status: 'A' },
+      duration:        { value: '15s or 30s',  status: 'A' },
+      companion:       { value: 'No',      status: 'N' },
+      companionProg:   { value: 'n/a',     status: 'N' },
+      companionDirect: { value: 'n/a',     status: 'N' },
+    }
+  },
+  {
+    name: 'SCA', specId: 'Listnr', adSpecs: 'https://advertise.listnr.com/ads/digital-advertising-guidelines/technical-guidelines/',
+    specs: {
+      fileType:        { value: 'MP3',      status: 'A' },
+      duration:        { value: '15s-30s',  status: 'A' },
+      companion:       { value: 'Yes',      status: 'A' },
+      companionProg:   { value: '300×250 (recommended), 640x640',  status: 'A' },
+      companionDirect: { value: '300×250 (recommended), 640x640',  status: 'A' },
+    }
+  },
+  {
+    name: 'Sonos Radio', specId: 'sonos', adSpecs: 'https://advertise.listnr.com/ads/digital-advertising-guidelines/technical-guidelines/',
+    specs: {
+      fileType:        { value: 'MP3',      status: 'A' },
+      duration:        { value: '10s-60s',  status: 'A' },
+      companion:       { value: 'No',      status: 'A' },
+      companionProg:   { value: 'n/a',      status: 'N' },
+      companionDirect: { value: 'n/a',      status: 'N' },
+    }
+  },  
+  {
+    name: 'SoundCloud', specId: 'SoundCloud', adSpecs: 'https://advertise.listnr.com/ads/digital-advertising-guidelines/technical-guidelines/',
+    specs: {
+      fileType:        { value: 'MP3',      status: 'A' },
+      duration:        { value: '6s-30s',   status: 'A' },
+      companion:       { value: 'Yes',      status: 'A' },
+      companionProg:   { value: '300×250',  status: 'A' },
+      companionDirect: { value: 'n/a',      status: 'N' },
+    }
+  },        
+  {
+    name: 'Spotify', specId: 'spotify', adSpecs: 'https://ads.spotify.com/en-NL/ad-experiences/audio-ads-specs/',
+    specs: {
+      fileType:        { value: 'MP3',                         status: 'A' },
+      duration:        { value: 'Up to 30s',                  status: 'A' },
+      companion:       { value: 'Yes',                   status: 'A' },
+      companionProg:   { value: '301×301 (DV360), 300×250 (TTD)', status: 'A' },
+      companionDirect: { value: '1:1 aspect ratio and at least 600×600',    status: 'A' },
+    }
+  },
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let mode = 'video'; // 'video' | 'audio'
+let selected = null;
+
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function currentPublishers() {
+  return mode === 'video' ? videoPublishers : audioPublishers;
+}
+
+function getSiblings(idx) {
+  const pubs = currentPublishers();
+  const specId = pubs[idx].specId;
+  return pubs.map((p, i) => ({ p, i })).filter(({ p, i }) => p.specId === specId && i !== idx);
+}
+
+function badge(status) {
+  if (status === 'A') return `<span class="badge badge-a"><span class="badge-dot"></span>On</span>`;
+  if (status === 'P') return `<span class="badge badge-o"><span class="badge-dot"></span>On</span>`;
+  if (status === 'U') return `<span class="badge badge-u"><span class="badge-dot"></span>Unknown</span>`;
+  if (status === 'N') return `<span class="badge badge-n"><span class="badge-dot"></span></span>`;
+  return `<span class="badge badge-off"><span class="badge-dot"></span>Off</span>`;
+}
+
+// ─── SWITCH MODE ───────────────────────────────────────────────────────────
+function switchMode(m) {
+  mode = m;
+  selected = null;
+  document.getElementById('btnVideo').classList.toggle('active', m === 'video');
+  document.getElementById('btnAudio').classList.toggle('active', m === 'audio');
+
+  // Update legend
+  /*const legend = document.getElementById('legend');
+  if (m === 'audio') {
+    legend.innerHTML = `
+      <div class="legend-item"><div class="legend-dot dot-a"></div> Accepted</div>
+      <div class="legend-item"><div class="legend-dot dot-p"></div> Possible</div>
+      <div class="legend-item"><div class="legend-dot dot-u"></div> Unknown</div>`;
+  } else {
+    legend.innerHTML = `
+      <div class="legend-item"><div class="legend-dot dot-a"></div> Accepted</div>
+      <div class="legend-item"><div class="legend-dot dot-p"></div> Possible</div>
+      <div class="legend-item"><div class="legend-dot dot-o"></div> Off</div>`;
+  }*/
+
+  renderPublishers();
+  renderPanel();
+}
+
+// ─── RENDER PUBLISHERS ─────────────────────────────────────────────────────
+function renderPublishers() {
+  const grid = document.getElementById('publisherGrid');
+  grid.innerHTML = '';
+  const pubs = currentPublishers();
+
+  const siblingIds = selected !== null ? getSiblings(selected).map(s => s.i) : [];
+
+  pubs.forEach((pub, i) => {
+    const btn = document.createElement('button');
+    const isActive = selected === i;
+    const isSibling = siblingIds.includes(i);
+    const inGroup = isActive && pubs.filter(p => p.specId === pub.specId).length > 1;
+
+    btn.className = ['pub-btn',
+      isActive ? 'active' : '',
+      isActive && inGroup ? 'in-group' : '',
+      isSibling ? 'sibling' : '',
+    ].filter(Boolean).join(' ');
+
+    btn.textContent = pub.name;
+    btn.onclick = () => {
+      selected = selected === i ? null : i;
+      renderPublishers();
+      renderPanel();
+    };
+    grid.appendChild(btn);
+  });
+}
+
+// ─── RENDER PANEL ──────────────────────────────────────────────────────────
+function renderPanel() {
+  const panel = document.getElementById('panel');
+
+  if (selected === null) {
+    panel.innerHTML = `<div class="empty-state"><div class="empty-icon">😔</div><h3>No publisher selected</h3><p>Pick a publisher to see its settings.</p></div>`;
+    return;
+  }
+
+  mode === 'video' ? renderVideoPanel(panel) : renderAudioPanel(panel);
+}
+
+function renderVideoPanel(panel) {
+  const pub = videoPublishers[selected];
+  const s = pub.s;
+  const aCount = s.filter(x => x === 'A').length;
+  const pCount = s.filter(x => x === 'P').length;
+
+  const siblings = getSiblings(selected);
+  const sharedHtml = siblings.length > 0
+    ? `<div class="shared-notice"><div class="shared-notice-dot"></div>Same specs as ${siblings.map(x => x.p.name).join(', ')}</div>`
+    : '';
+
+  const rows = videoTranscodes.map((tc, i) => `
+    <div class="tc-row video-cols${tc.special ? ' special' : ''}" style="animation-delay:${i*18}ms">
+      <div class="cell-label">${tc.type}</div>
+      <div class="cell-value">${tc.res}</div>
+      <div class="cell-target">${tc.bitrate}</div>
+      <div>${badge(s[i])}</div>
+    </div>`).join('');
+
+  const footer = pub.adSpecs
+    ? `<div class="panel-footer"><a class="ad-specs-btn" href="${pub.adSpecs}" target="_blank">View Ad Specs ↗</a></div>`
+    : '';
+
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div>
+        <div class="panel-pub-name">${pub.name}</div>
+        <div class="panel-sub">Transcode requirements · Video</div>
+        ${sharedHtml}
+      </div>
+    </div>
+    <div class="notice notice-amber"><div class="notice-dot"></div>Ensure any VPAID tag and third-party measurement options are disabled.</div>
+    ${pub.adgileWarning ? `<div class="notice notice-red"><div class="notice-dot"></div>Adgile must be removed for this publisher.</div>` : ''}
+    <div class="col-header video-cols">
+      <div class="col-th">Type</div>
+      <div class="col-th">Resolution</div>
+      <div class="col-th">Bitrate</div>
+      <div class="col-th">Status</div>
+    </div>
+    ${rows}
+    ${footer}`;
+}
+
+function renderAudioPanel(panel) {
+  const pub = audioPublishers[selected];
+
+  const siblings = getSiblings(selected);
+  const sharedHtml = siblings.length > 0
+    ? `<div class="shared-notice"><div class="shared-notice-dot"></div>Same specs as ${siblings.map(x => x.p.name).join(', ')}</div>`
+    : '';
+
+  const rows = audioSpecs.map((spec, i) => {
+    const data = pub.specs[spec.key];
+    return `
+      <div class="tc-row audio-cols" style="animation-delay:${i*18}ms">
+        <div class="cell-label">${spec.label}</div>
+        <div class="cell-value">${data.value}</div>
+      </div>`;
+  }).join('');
+
+  const footer = pub.adSpecs
+    ? `<div class="panel-footer"><a class="ad-specs-btn" href="${pub.adSpecs}" target="_blank">View Ad Specs ↗</a></div>`
+    : '';
+
+  panel.innerHTML = `
+    <div class="panel-header">
+      <div>
+        <div class="panel-pub-name">${pub.name}</div>
+        <div class="panel-sub">Ad requirements · Audio</div>
+        ${sharedHtml}
+      </div>
+    </div>
+    <div class="col-header audio-cols">
+      <div class="col-th">Spec</div>
+      <div class="col-th">Value</div>
+    </div>
+    ${rows}
+    ${footer}`;
+}
+
+//   COUNT in HEADER in panel.innerHTML  after ${sharedHtml} </div>
+//      <div class="stats">
+//        <div class="stat a"><div class="stat-num">${aCount}</div><div class="stat-label">Accepted</div></div>
+//        <div class="stat p"><div class="stat-num">${pCount}</div><div class="stat-label">Possible</div></div>
+//      </div>
+
+
+//         <div>${badge(data.status)}</div>
+//       <div class="col-th">Status</div>
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+renderPublishers();
+renderPanel();
+</script>
+</body>
+</html>
