@@ -920,6 +920,7 @@
       logs.innerHTML = '';
       adDetails.innerHTML = 'Load tag to see ad info';
       document.getElementById('tag').value = '';
+      document.querySelector('.gradient-btn').classList.remove('active');
       content.pause();
       content.removeAttribute('src');
       content.classList.remove('loaded');
