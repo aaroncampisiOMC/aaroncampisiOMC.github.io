@@ -45,18 +45,22 @@
   }  
 
   .header {
-    max-width: 1280px;
-    margin: 0 auto;
-    margin-top: 48px;
-    padding: 48px 24px 0;
-    opacity: 0.25;
+    position: absolute;   /* Pulls header out of normal flow so it doesn't push the buttons */
+    top: 0; 
+    left: 50%;
+    transform: translateX(-50%); /* Pulls it back by half its width to center it perfectly */
+    Margin-top: 80px;   /* Adds space above the header */
+    opacity: 0.1;
   }
 
   .title {
     font-family: 'DM Sans';
-    font-size: 3rem; font-weight: 600;
-    letter-spacing: -0.02em; line-height: 1.05;
-    color: var(--text); margin-bottom: 6px;
+    font-size: 3rem; 
+    font-weight: 600;
+    letter-spacing: -0.02em; 
+    line-height: 1.05;
+    color: var(--text); 
+    margin-bottom: 6px;
   }
 
   .title-row {
@@ -68,12 +72,14 @@
   .subtitle {
     font-size: 1.2rem; font-weight: 400;
     letter-spacing: -0.03em;
-    color: var(--text-secondary);
+    color: var(--text);
     line-height: 1.05;
     align-self: center;
     margin-top: 0px;
     /* margin-bottom: 72px; */
     margin-bottom: 0px;
+    white-space: nowrap;
+
   }  
 
   body {
@@ -86,30 +92,39 @@
     display: flex;
     flex-direction: column;   /* stack header + button row vertically */
     margin: 0;
+    justify-content: center;   /* Centers the button row horizontally */
+    align-items: center;
+    min-height: 100vh;
+    position: relative; /* Crucial: Acts as the anchor point for the absolute header */
   }
 
   .button-row {
     display: flex;
-    flex: 1;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 100px;
+    /* gap: 100px; */
+    gap: clamp(24px, 7vw, 100px);
   }  
 
-  a.button { 
+  a.button {
+    background: var(--bg); 
     font-family: 'DM Sans';
-    font-size: 6rem; font-weight: 600;
+    font-weight: 600;
+    font-size: clamp(2rem, 7vw, 6rem);
+    width: clamp(200px, 40vw, 500px);
     letter-spacing: -0.02em; line-height: 1.05;
     padding: 20px 40px; 
     text-decoration: none; 
-    color: var(--text); 
+    color: var(--text-tertiary); 
     border-radius: var(--radius-sm); 
     transition: all 0.5s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+    white-space: nowrap;
+    /* width: 500px; */
+    text-align: center;
     /* border: 4px solid #33333310; */
   }
     
-
   a.button:hover { 
     background: var(--surface); 
     box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
@@ -117,6 +132,7 @@
     transition: all 0.3s ease; 
     /* border: 4px solid #33333300; */
   }
+    
 
 </style>
 
