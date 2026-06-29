@@ -112,7 +112,7 @@
       display: flex;
       gap: 12px;
       width: 100%;
-      align-items: centre;
+      align-items: center;
     }
 
     #tag {
@@ -222,7 +222,7 @@
       font-weight: 400;
       font-size: 0.875rem;
       line-height: 1.6;
-      height: 100px;
+      height: 124px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -395,7 +395,7 @@
       }
 
       #info {
-        height: 132px;
+        height: 156px;
         margin-top: 20px;
         box-sizing: border-box;
       }
@@ -409,6 +409,29 @@
       .left > div:last-child {
         align-self: stretch;
       }
+    }
+
+    /* Companion banner image tooltip */
+    #image-tooltip {
+      position: fixed;
+      pointer-events: none;
+      background-color: white;
+      padding: 5px;
+      border-radius: 6px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 9999;
+      display: none;
+    }
+
+    #image-tooltip.visible {
+      display: block;
+    }
+
+    #image-tooltip img {
+      width: 200px;
+      height: auto;
+      display: block;
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -464,6 +487,10 @@
   
   </div>
 
+  <div id="image-tooltip">
+    <img id="tooltip-img" src="" alt="Companion preview">
+  </div>
+
   <script>
     const content = document.getElementById('content');
     const adContainer = document.getElementById('ad-container');
@@ -481,6 +508,36 @@
       logs.appendChild(line);
       logs.scrollTop = logs.scrollHeight;
     };
+
+    // Companion banner image tooltip
+    const imageTooltip = document.getElementById('image-tooltip');
+    const tooltipImg = document.getElementById('tooltip-img');
+
+    function attachTooltipListeners() {
+      document.querySelectorAll('.hover-link').forEach(link => {
+        link.addEventListener('mouseenter', () => {
+          tooltipImg.src = link.getAttribute('data-preview');
+          imageTooltip.classList.add('visible');
+        });
+
+        link.addEventListener('mousemove', (e) => {
+          const offset = 15;
+          const tw = imageTooltip.offsetWidth;
+          const th = imageTooltip.offsetHeight;
+          let x = e.clientX + offset;
+          let y = e.clientY + offset;
+          if (x + tw > window.innerWidth) x = e.clientX - tw - offset;
+          if (y + th > window.innerHeight) y = e.clientY - th - offset;
+          imageTooltip.style.left = x + 'px';
+          imageTooltip.style.top  = y + 'px';
+        });
+
+        link.addEventListener('mouseleave', () => {
+          imageTooltip.classList.remove('visible');
+          tooltipImg.src = '';
+        });
+      });
+    }
 
     // Custom VAST Parser
     class VASTParser {
@@ -541,7 +598,8 @@
             mediaFiles: [],
             trackingEvents: {},
             clickThrough: null,
-            clickTracking: []
+            clickTracking: [],
+            companionUrl: null
           };
 
           // Parse media files
@@ -577,6 +635,12 @@
           clickTracking.forEach(ct => {
             adData.clickTracking.push(ct.textContent.trim());
           });
+
+          // Parse companion banner
+          const companion = inline.querySelector('Companion StaticResource');
+          if (companion) {
+            adData.companionUrl = companion.textContent.trim();
+          }
 
           log('VAST parsed successfully');
           return adData;
@@ -658,11 +722,18 @@
             ? `<a href="${finalUrl}" target="_blank" title="${cleanUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">${displayUrl}</a>`
             : cleanUrl;
 
+        const companionHtml = adData.companionUrl
+          ? `Yes — <a href="${adData.companionUrl}" target="_blank" class="hover-link" data-preview="${adData.companionUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">preview</a>`
+          : 'No';
+
         adDetails.innerHTML = `
             Compatibility: ${adData.title || 'Unknown'}<br>
             Duration: ${duration > 0 ? Math.round(duration) + ' seconds' : 'Unknown'}<br>
-            Click-through URL: ${urlHtml}
+            Click-through URL: ${urlHtml}<br>
+            Companion banner: ${companionHtml}
             `;
+
+        attachTooltipListeners();
 
         // Select best media file (prefer MP4)
         const mediaFile = this.selectMediaFile(adData.mediaFiles);
@@ -936,8 +1007,6 @@
       tag.value = updated;
       log('Replaced %%...%% macros with [...]');
     };
-
-
   </script>
 </body>
 </html>
