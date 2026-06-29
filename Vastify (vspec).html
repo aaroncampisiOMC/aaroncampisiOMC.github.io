@@ -599,7 +599,7 @@
             trackingEvents: {},
             clickThrough: null,
             clickTracking: [],
-            companionUrl: null
+            companions: []
           };
 
           // Parse media files
@@ -636,11 +636,18 @@
             adData.clickTracking.push(ct.textContent.trim());
           });
 
-          // Parse companion banner
-          const companion = inline.querySelector('Companion StaticResource');
-          if (companion) {
-            adData.companionUrl = companion.textContent.trim();
-          }
+          // Parse companion banners
+          adData.companions = [];
+          inline.querySelectorAll('Companion').forEach(companion => {
+            const resource = companion.querySelector('StaticResource');
+            if (resource) {
+              adData.companions.push({
+                url: resource.textContent.trim(),
+                width: companion.getAttribute('width'),
+                height: companion.getAttribute('height')
+              });
+            }
+          });
 
           log('VAST parsed successfully');
           return adData;
@@ -722,15 +729,17 @@
             ? `<a href="${finalUrl}" target="_blank" title="${cleanUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">${displayUrl}</a>`
             : cleanUrl;
 
-        const companionHtml = adData.companionUrl
-          ? `Yes — <a href="${adData.companionUrl}" target="_blank" class="hover-link" data-preview="${adData.companionUrl}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">preview</a>`
-          : 'No';
+        const companionHtml = adData.companions.length > 0
+          ? adData.companions.map(c =>
+              `<a href="${c.url}" target="_blank" class="hover-link" data-preview="${c.url}" style="color: #4286f4; text-decoration: none; border-bottom: 1px dotted #4286f4;">${c.width}×${c.height}</a>`
+            ).join(' &middot; ')
+          : 'None';
 
         adDetails.innerHTML = `
             Compatibility: ${adData.title || 'Unknown'}<br>
             Duration: ${duration > 0 ? Math.round(duration) + ' seconds' : 'Unknown'}<br>
             Click-through URL: ${urlHtml}<br>
-            Companion banner: ${companionHtml}
+            Companions: ${companionHtml}
             `;
 
         attachTooltipListeners();
